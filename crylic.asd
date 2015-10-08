@@ -4,12 +4,11 @@
   :license "MIT"
   :depends-on (#:cl-ppcre)
   :pathname "src"
-  :components ((:file "lexer")
-               (:file "tokens")
+  :components ((:file "tokens")
+               (:file "lexer")
                (:file "renderer")
                (:file "regex-lexer")
                (:module "lexers"
-                :components ((:file "conf")
-                             (:file "ini")))
+                :components ((:file "ini")))
                (:module "renderers"
                 :components ((:file "html")))))

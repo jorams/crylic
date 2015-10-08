@@ -57,10 +57,10 @@ together."
     ;; Entered a different token class
     (t
      (prog1 t
-       (push (make-instance *last-token-class*
-                            :text (subseq *input*
-                                          capture-start
-                                          capture-end))
+       (push (cons *last-token-class*
+                   (subseq *input*
+                           capture-start
+                           capture-end))
              *tokens*)
        (setf *last-token-class* class)))))
 
@@ -80,26 +80,31 @@ together."
 
 (defun enter-state (lexer name)
   "Continue processing input using the new state."
-  (process lexer name))
+  (if (eq name :pop!)
+      (throw :pop! t)
+      (process lexer name)))
 
 
-(defun try-progress (lexer regex token state groups)
+(defun try-progress (lexer regex instructions)
   "Try to match REGEX and, if it matches, move forward by collecting tokens
 and/or entering a new state."
   (multiple-value-bind (start end reg-start reg-end)
       (ppcre:scan regex *input* :start *match-end-position*)
     (when (and start end)
-      (prog1 t
-        ;; Update the capture end to point to the previous match end, and the
-        ;; match end to point to the newly found match end.
-        (setf *capture-end-position* *match-end-position*
-              *match-end-position* end)
-        (cond
-          (token (progress-token token))
-          (groups (progress-groups groups reg-start reg-end)))
-        (when state (enter-state lexer state))))))
+      ;; Update the capture end to point to the previous match end, and the
+      ;; match end to point to the newly found match end.
+      (setf *capture-end-position* *match-end-position*
+            *match-end-position* end)
+      (dolist (instruction instructions)
+        (destructuring-bind (operator argument) instruction
+          (case operator
+            (:token (progress-token argument))
+            (:groups (progress-groups argument reg-start reg-end))
+            (:state (enter-state lexer argument))
+            (t (funcall operator argument)))))
+      (throw :restart t))))
 
-(defmacro %rule (lexer-sym pattern (&key token state groups) &body body)
+(defmacro %rule (lexer-sym pattern &body instructions)
   (let* ((regex (format nil "^~A"
                         (if (consp pattern)
                             (first pattern)
@@ -108,19 +113,10 @@ and/or entering a new state."
                     ,@(if (consp pattern)
                           (cons regex (cdr pattern))
                           (list regex))
-                    :single-line-mode t)))
-    (if (or token state groups)
-        `(progn
-           (when (try-progress ,lexer-sym ,scanner ,token
-                               ,(unless (eq state :pop!)
-                                  state)
-                               ,groups)
-             (when ,(eq state :pop!)
-               (throw :pop! t))))
-        `(progn
-           (when (try-progress ,lexer-sym ,scanner nil nil nil)
-             ;; TODO: Do something sensible with BODY
-             ,@body)))))
+                    :single-line-mode nil
+                    :multi-line-mode t)))
+    (unless (null instructions)
+      `(try-progress ,lexer-sym ,scanner ',instructions))))
 
 (defmacro defstate (lexer name &body rules)
   (let* ((lexer-sym (gensym))
@@ -134,9 +130,11 @@ and/or entering a new state."
                       end)))
     `(defmethod %process ((,lexer-sym ,lexer) (,state-sym (eql ,name)))
        (or ,@rules
-           (%rule ,lexer-sym "$" (:token 'crylic/tokens:eof
-                                  :state :pop!))))))
+           (%rule ,lexer-sym "$"
+             (:token :eof)
+             (:state :pop!))))))
 
 (defmethod process ((lexer regex-lexer) state)
   (catch :pop!
-    (loop (%process lexer state))))
+    (loop (catch :restart
+            (%process lexer state)))))

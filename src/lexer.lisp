@@ -10,14 +10,7 @@
 
            #:*lexers*
            #:define-lexer
-           #:lex
-
-           #:token
-           #:short-name
-           #:text
-
-           #:deftoken
-           #:define-tokens))
+           #:lex))
 (in-package :crylic/lexer)
 
 ;;; The first step a piece of input text is going to go through is the lexing
@@ -58,35 +51,3 @@
 (defgeneric lex (lexer text)
   (:documentation "Lex the given input TEXT using LEXER. The result of this
 operation is a list of TOKENs."))
-
-;;; A token is a simple unit for denoting a piece of text is of a certain type.
-;;; It has a slot, TEXT, containing the text enclosed by the token. It also has
-;;; a slot SHORT-NAME, containing a short version of the token type's name.
-
-(defclass token ()
-  ((short-name :initarg :short-name
-               :reader short-name)
-   (text :initarg :text
-         :initform nil
-         :reader text)))
-
-(defmacro deftoken (name short-name &body sub-tokens)
-  "Convenience macro for defining token classes. NAME will be the name of the
-new class, SHORT-NAME will be the default value of the SHORT-NAME slot of every
-instance (after downcasing) and each item in SUB-TOKENS should look like a
-valid invocation of DEFTOKEN, except without the DEFTOKEN.
-
-The top-level class will be named after NAME, and every sub-token will have as
-a class name NAME/SUB-TOKEN-NAME."
-  `(progn
-     (export ',name)
-     (defclass ,name (token) ()
-       (:default-initargs :short-name ,(string-downcase short-name)))
-     ,@(loop for sub-token in sub-tokens
-             collect `(deftoken ,(intern (format nil "~A/~A" name (first sub-token)))
-                          ,(second sub-token)
-                        ,@(cddr sub-token)))))
-
-(defmacro define-tokens (&body tokens)
-  `(progn ,@(loop for token in tokens
-                  collect (cons 'deftoken token))))

@@ -1,8 +1,5 @@
 (defpackage :crylic/renderers/html
-  (:use :cl :crylic/renderer)
-  (:import-from :crylic/lexer
-                #:short-name
-                #:text)
+  (:use :cl :crylic/renderer :crylic/tokens)
   (:import-from :cl-ppcre
                 #:regex-replace-all)
   (:export #:html-renderer))
@@ -35,8 +32,8 @@
 
 (defmethod render ((renderer html-renderer) (tokens list) (stream stream))
   (when (wrap-p renderer)
-    (format stream "<pre class=\"~A\"><code>" (wrapper-css-class renderer)))
+    (format stream "<div class=\"~A\"><pre>" (wrapper-css-class renderer)))
   (dolist (token tokens)
     (render-span token stream))
   (when (wrap-p renderer)
-    (format stream "</code></pre>~%")))
+    (format stream "</pre></div>~%")))

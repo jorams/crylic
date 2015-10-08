@@ -1,101 +1,122 @@
-;;;; This file defines all token types to be generated during the lexing
-;;;; process. The package defined here does not use the COMMON-LISP package, as
-;;;; its sole purpose is to contain token types.
+(defpackage :crylic/tokens
+  (:use :cl)
+  (:export #:short-name
+           #:text))
+(in-package :crylic/tokens)
 
-(cl:defpackage :crylic/tokens
-  (:use :crylic/lexer))
-(cl:in-package :crylic/tokens)
+;;; A token is a simple unit for denoting a piece of text is of a certain type.
+;;; It's stored as a cons cell of which the CAR is the token's keyword name and
+;;; the CDR is a string representing the token's textual content.
 
-(define-tokens
-  (text ""
-        (whitespace "w"))
+(defvar *tokens* ())
+(defvar *token-short-names* (make-hash-table))
 
-  (error "err")
-  (other "x")
+(defun short-name (token)
+  (gethash (if (consp token)
+               (car token)
+               token)
+           *token-short-names*))
 
-  (keyword "k"
-           (constant "kc")
-           (declaration "kd")
-           (namespace "kn")
-           (pseudo "kp")
-           (reserved "kr")
-           (type "kt")
-           (variable "kv"))
+(defun text (token)
+  (cdr token))
 
-  (name "n"
-        (attribute "na")
-        (builtin "nb"
-                 (pseudo "bp"))
-        (class "nc")
-        (constant "no")
-        (decorator "nd")
-        (entity "ni")
-        (exception "ne")
-        (function "nf")
-        (property "py")
-        (label "nl")
-        (namespace "nn")
-        (other "nx")
-        (tag "nt")
-        (variable "nv"
-                  (class "vc")
-                  (global "vg")
-                  (instance "vi")))
+(defmacro define-token-type (name short-name)
+  `(progn
+     (pushnew ',name *tokens*)
+     (setf (gethash ',name *token-short-names*)
+           ,short-name)))
 
-  (literal "l"
-           (date "ld")
-           (string "s"
-                   (backtick "sb")
-                   (char "sc")
-                   (doc "sd")
-                   (double "s2")
-                   (escape "se")
-                   (heredoc "sh")
-                   (interpol "si")
-                   (other "sx")
-                   (regex "sr")
-                   (single "s1")
-                   (symbol "ss"))
+(defmacro define-token-types (&body tokens)
+  `(progn ,@(loop for token in tokens
+                  collect (cons 'define-token-type token))))
 
-           (number "m"
-                   (float "mf")
-                   (hex "mh")
-                   (integer "mi")
-                   (long "il"))
-           (oct "mo")
-           (bin "mb")
-           (other "mx"))
+;;; Concrete token-type definitions -------------------------------------------
 
-  (operator "o"
-            (word "ow"))
-
-  (punctuation "p"
-               (indicator "pi"))
-
-  (comment "c"
-           (doc "cd")
-           (multiline "cm")
-           (preproc "cp")
-           (single "c1")
-           (special "cs"))
-
-  (generic "g"
-           (deleted "gd")
-           (emph "ge")
-           (error "gr")
-           (heading "gh")
-           (inserted "gi")
-           (output "go")
-           (prompt "gp")
-           (strong "gs")
-           (subheading "gu")
-           (traceback "gt")
-           (lineno "gl")))
-
-;; The EOF token type is special, in that it should never be instantiated. It
+;; The EOF token type is special, in that it should never actually be used. It
 ;; can be used by lexers to signify processing should have ended.
-(cl:export 'eof)
-(cl:defclass eof (token)
-  ()
-  (:default-initargs
-   :short-name (cl:error "EOF-TOKEN should never be instantiated!")))
+(define-token-type :eof "ERROR")
+
+(define-token-types
+  (:token                         "")
+
+  (:text                          "")
+  (:whitespace                    "w")
+  (:escape                        "esc")
+  (:error                         "err")
+  (:other                         "x")
+
+  (:keyword                       "k")
+  (:keyword.constant              "kc")
+  (:keyword.declaration           "kd")
+  (:keyword.namespace             "kn")
+  (:keyword.pseudo                "kp")
+  (:keyword.reserved              "kr")
+  (:keyword.type                  "kt")
+
+  (:name                          "n")
+  (:name.attribute                "na")
+  (:name.builtin                  "nb")
+  (:name.builtin.pseudo           "bp")
+  (:name.class                    "nc")
+  (:name.constant                 "no")
+  (:name.decorator                "nd")
+  (:name.entity                   "ni")
+  (:name.exception                "ne")
+  (:name.function                 "nf")
+  (:name.property                 "py")
+  (:name.label                    "nl")
+  (:name.namespace                "nn")
+  (:name.other                    "nx")
+  (:name.tag                      "nt")
+  (:name.variable                 "nv")
+  (:name.variable.class           "vc")
+  (:name.variable.global          "vg")
+  (:name.variable.instance        "vi")
+
+  (:literal                       "l")
+  (:literal.date                  "ld")
+
+  (:string                        "s")
+  (:string.backtick               "sb")
+  (:string.char                   "sc")
+  (:string.doc                    "sd")
+  (:string.double                 "s2")
+  (:string.escape                 "se")
+  (:string.heredoc                "sh")
+  (:string.interpol               "si")
+  (:string.other                  "sx")
+  (:string.regex                  "sr")
+  (:string.single                 "s1")
+  (:string.symbol                 "ss")
+
+  (:number                        "m")
+  (:number.bin                    "mb")
+  (:number.float                  "mf")
+  (:number.hex                    "mh")
+  (:number.integer                "mi")
+  (:number.integer.long           "il")
+  (:number.oct                    "mo")
+
+  (:operator                      "o")
+  (:operator.word                 "ow")
+
+  (:punctuation                   "p")
+
+  (:comment                       "c")
+  (:comment.hashbang              "ch")
+  (:comment.multiline             "cm")
+  (:comment.preproc               "cp")
+  (:comment.single                "c1")
+  (:comment.special               "cs")
+
+  (:generic                       "g")
+  (:generic.deleted               "gd")
+  (:generic.emph                  "ge")
+  (:generic.error                 "gr")
+  (:generic.heading               "gh")
+  (:generic.inserted              "gi")
+  (:generic.output                "go")
+  (:generic.prompt                "gp")
+  (:generic.strong                "gs")
+  (:generic.subheading            "gu")
+  (:generic.traceback             "gt"))
