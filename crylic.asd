@@ -2,7 +2,7 @@
   :description "Syntax highlighting library for Common Lisp"
   :author "Joram Schrijver <i@joram.io>"
   :license "MIT"
-  :depends-on (#:cl-ppcre)
+  :depends-on (#:cl-ppcre #:closer-mop)
   :pathname "src"
   :components ((:file "tokens")
                (:file "lexer")

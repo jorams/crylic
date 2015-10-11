@@ -4,7 +4,8 @@
            #:defstate))
 (in-package :crylic/regex-lexer)
 
-(defclass regex-lexer (lexer) ())
+(defclass regex-lexer () ()
+  (:metaclass lexer-class))
 
 (defgeneric %process (lexer state))
 (defgeneric process (lexer state))

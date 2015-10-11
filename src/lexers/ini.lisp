@@ -4,12 +4,11 @@
 (in-package :crylic/lexers/ini)
 
 (define-lexer ini-lexer (regex-lexer) ()
-  (:default-initargs
-   :title "INI"
-   :description "Lexer for configuration files in INI style."
-   :tags (list "ini" "cfg" "dosini")
-   :filenames (list "*.ini" "*.cfg")
-   :mime-types "text/x-ini"))
+  (:title "INI")
+  (:description "Lexer for configuration files in INI style.")
+  (:tags "ini" "cfg" "dosini")
+  (:filenames "*.ini" "*.cfg")
+  (:mime-types "text/x-ini"))
 
 (defstate ini-lexer :root
   ("\\s+" (:token :text))

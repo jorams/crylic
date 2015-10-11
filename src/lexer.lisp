@@ -1,6 +1,6 @@
 (defpackage :crylic/lexer
-  (:use :cl)
-  (:export #:lexer
+  (:use :closer-common-lisp)
+  (:export #:lexer-class
            #:title
            #:description
            #:tags
@@ -20,28 +20,45 @@
 (defvar *lexers* ())
 
 ;;; Lexers have a couple of basic properties, such as a name, associated file
-;;; extensions, etc.
+;;; extensions, etc. These are properties of the class, so they are implemented
+;;; in a metaclass.
 
-(defclass lexer ()
+(defclass lexer-class (standard-class)
   ((%title :initarg :title
-           :initform nil
+           :initform ()
            :reader title)
    (%description :initarg :description
-                 :initform nil
+                 :initform ()
                  :reader description)
    (%tags :initarg :tags
-          :initform nil
+          :initform ()
           :reader tags)
    (%filenames :initarg :filenames
-               :initform nil
+               :initform ()
                :reader filenames)
    (%mime-types :initarg :mime-types
-                :initform nil
+                :initform ()
                 :reader mime-types)))
+
+(defmethod validate-superclass ((class lexer-class)
+                                (super-class standard-class))
+  t)
+
+(defmethod ensure-class-using-class :after ((class lexer-class)
+                                            name
+                                            &key &allow-other-keys)
+  "Sets the title and description slots of the class, which should be a list, to
+just their first element. This allows their definition in a DEFCLASS form to
+just be (:title \"some-title\"), instead of (:title . \"some-title\")."
+  (setf (slot-value class '%title)       (first (title class))
+        (slot-value class '%description) (first (description class))))
 
 (defmacro define-lexer (name superclasses direct-slots &rest options)
   `(progn
-     (defclass ,name ,superclasses ,direct-slots ,@options)
+     (defclass ,name ,superclasses
+       ,direct-slots
+       (:metaclass lexer-class)
+       ,@options)
      (pushnew ',name *lexers*)))
 
 ;;; The simple construct that performs lexing is the LEX generic function. It
