@@ -54,3 +54,13 @@
                    crylic/lexers/ini:ini-lexer
                    "ini"
                    "test.ini")
+
+(test-compare-html properties
+                   crylic/lexers/properties:properties-lexer
+                   "properties"
+                   "java.properties")
+
+(test-compare-html regedit
+                   crylic/lexers/regedit:regedit-lexer
+                   "registry"
+                   "example.reg")

@@ -7,6 +7,8 @@
   :depends-on (:crylic :1am)
   :components ((:file "framework")
                (:module "examples"
-                :components ((:static-file "test.ini"))))
+                :components ((:static-file "test.ini")
+                             (:static-file "java.properties")
+                             (:static-file "example.reg"))))
   :perform (test-op :after (op component)
                     (funcall (intern "RUN" :crylic-test/framework))))

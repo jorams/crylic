@@ -11,7 +11,9 @@
                (:file "renderer")
                (:file "regex-lexer")
                (:module "lexers"
-                :components ((:file "ini")))
+                :components ((:file "ini")
+                             (:file "properties")
+                             (:file "regedit")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))
