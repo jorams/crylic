@@ -99,7 +99,9 @@ and/or entering a new state."
     `(defmethod %process ((,lexer-sym ,lexer) (,state-sym (eql ,name)))
        (or ,@rules
            (%rule ,lexer-sym "$"
-             (:state :pop!))))))
+             (:state :pop!))
+           (%rule ,lexer-sym "."
+             (:token :error))))))
 
 (defmethod process ((lexer regex-lexer) state)
   (catch :pop!
