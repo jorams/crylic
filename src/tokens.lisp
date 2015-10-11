@@ -32,10 +32,6 @@
 
 ;;; Concrete token-type definitions -------------------------------------------
 
-;; The EOF token type is special, in that it should never actually be used. It
-;; can be used by lexers to signify processing should have ended.
-(define-token-type :eof "ERROR")
-
 (define-token-types
   (:token                         "")
 
