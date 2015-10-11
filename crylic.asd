@@ -6,6 +6,7 @@
   :pathname "src"
   :components ((:file "tokens")
                (:file "lexer")
+               (:file "filter")
                (:file "renderer")
                (:file "regex-lexer")
                (:module "lexers"
