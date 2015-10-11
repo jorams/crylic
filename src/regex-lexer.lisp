@@ -90,7 +90,7 @@ together."
 and/or entering a new state."
   (multiple-value-bind (start end reg-start reg-end)
       (ppcre:scan regex *input* :start *match-end-position*)
-    (when (and start end)
+    (when (and start end (= start *match-end-position*))
       ;; Update the capture end to point to the previous match end, and the
       ;; match end to point to the newly found match end.
       (setf *capture-end-position* *match-end-position*
