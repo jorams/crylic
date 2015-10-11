@@ -13,7 +13,8 @@
                (:module "lexers"
                 :components ((:file "ini")
                              (:file "properties")
-                             (:file "regedit")))
+                             (:file "regedit")
+                             (:file "cfengine3")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))

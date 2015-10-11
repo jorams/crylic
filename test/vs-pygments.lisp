@@ -34,8 +34,9 @@
    (make-instance 'html-renderer)
    (filter (make-instance 'merge-consecutive-filter)
            (filter (make-instance 'split-multiline-filter)
-                   (lex (make-instance lexer-class)
-                        string)))))
+                   (filter (make-instance 'merge-consecutive-filter)
+                           (lex (make-instance lexer-class)
+                                string))))))
 
 (defmacro test-compare-html (name lexer-class pygments-lexer file)
   (let ((path (merge-pathnames file *examples-directory*)))
@@ -64,3 +65,8 @@
                    crylic/lexers/regedit:regedit-lexer
                    "registry"
                    "example.reg")
+
+(test-compare-html cfengine3
+                   crylic/lexers/cfengine3:cfengine3-lexer
+                   "cfengine3"
+                   "example.cf")
