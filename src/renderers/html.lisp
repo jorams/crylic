@@ -17,7 +17,7 @@
 
 (defun render-span (token stream)
   (let ((text (regex-replace-all "[&<>'\"]"
-                                 (text token)
+                                 (token-text token)
                                  (lambda (match &rest ignored)
                                    (declare (ignore ignored))
                                    (ecase (char match 0)
@@ -27,7 +27,7 @@
                                      (#\" "&quot;")
                                      (#\' "&#39;")))
                                  :simple-calls t))
-        (short-name (short-name token)))
+        (short-name (token-short-name token)))
     (if (zerop (length short-name))
         (format stream "~A" text)
         (format stream "<span class=\"~A\">~A</span>"

@@ -1,7 +1,8 @@
 (defpackage :crylic/tokens
   (:use :cl)
-  (:export #:short-name
-           #:text))
+  (:export #:token-short-name
+           #:token-type
+           #:token-text))
 (in-package :crylic/tokens)
 
 ;;; A token is a simple unit for denoting a piece of text is of a certain type.
@@ -11,13 +12,16 @@
 (defvar *tokens* ())
 (defvar *token-short-names* (make-hash-table))
 
-(defun short-name (token)
+(defun token-short-name (token)
   (gethash (if (consp token)
                (car token)
                token)
            *token-short-names*))
 
-(defun text (token)
+(defun token-type (token)
+  (car token))
+
+(defun token-text (token)
   (cdr token))
 
 (defmacro define-token-type (name short-name)
