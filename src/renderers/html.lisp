@@ -16,13 +16,17 @@
                      :description "Render tokens to HTML"))
 
 (defun render-span (token stream)
-  (let ((text (regex-replace-all "[&<>]"
+  (let ((text (regex-replace-all "[&<>'\"]"
                                  (text token)
-                                 (lambda (match)
-                                   (case (char match 0)
+                                 (lambda (match &rest ignored)
+                                   (declare (ignore ignored))
+                                   (ecase (char match 0)
                                      (#\& "&amp;")
                                      (#\< "&lt;")
-                                     (#\> "&gt;")))))
+                                     (#\> "&gt;")
+                                     (#\" "&quot;")
+                                     (#\' "&#39;")))
+                                 :simple-calls t))
         (short-name (short-name token)))
     (if (zerop (length short-name))
         (format stream "~A" text)
