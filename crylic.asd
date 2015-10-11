@@ -1,4 +1,5 @@
-(asdf:defsystem :crylic
+(in-package :asdf-user)
+(defsystem :crylic
   :description "Syntax highlighting library for Common Lisp"
   :author "Joram Schrijver <i@joram.io>"
   :license "MIT"
@@ -15,4 +16,5 @@
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))
                (:module "renderers"
-                :components ((:file "html")))))
+                :components ((:file "html"))))
+  :in-order-to ((test-op (test-op :crylic-test))))
