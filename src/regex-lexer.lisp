@@ -27,11 +27,12 @@
 
 (defun capture-token (type capture-start capture-end)
   "This function is responsible for collecting new tokens."
-  (push (cons type
-              (subseq *input*
-                      capture-start
-                      capture-end))
-        *tokens*))
+  (unless (= capture-start capture-end)
+    (push (cons type
+                (subseq *input*
+                        capture-start
+                        capture-end))
+          *tokens*)))
 
 (defun progress-token (class start end)
   "Capture a token and update capture positions."
