@@ -60,7 +60,7 @@
 and/or entering a new state."
   (multiple-value-bind (start end reg-start reg-end)
       (ppcre:scan regex *input* :start *position*)
-    (when (and start end (= start *position*))
+    (when (and start end)
       ;; Update the capture end to point to the previous match end, and the
       ;; match end to point to the newly found match end.
       (loop for (operator argument) on instructions by #'cddr
@@ -72,7 +72,7 @@ and/or entering a new state."
       (throw :restart t))))
 
 (defmacro %rule (lexer-sym pattern &body instructions)
-  (let* ((regex (format nil "^~A"
+  (let* ((regex (format nil "\\A~A"
                         (if (consp pattern)
                             (first pattern)
                             pattern)))
