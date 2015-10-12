@@ -72,35 +72,57 @@ and/or entering a new state."
       (throw :restart t))))
 
 (defmacro %rule (lexer-sym pattern &body instructions)
+  (unless (null instructions)
+    `(try-progress ,lexer-sym ,pattern ',instructions)))
+
+(defun rule-scanner-definition (pattern)
   (let* ((regex (format nil "\\A~A"
                         (if (consp pattern)
                             (first pattern)
-                            pattern)))
-         (scanner `(ppcre:create-scanner
-                    ,@(if (consp pattern)
-                          (cons regex (cdr pattern))
-                          (list regex))
-                    :single-line-mode nil
-                    :multi-line-mode t)))
-    (unless (null instructions)
-      `(try-progress ,lexer-sym ,scanner ',instructions))))
+                            pattern))))
+    `(ppcre:create-scanner
+      ,@(if (consp pattern)
+            (cons regex (cdr pattern))
+            (list regex))
+      :single-line-mode nil
+      :multi-line-mode t)))
 
 (defmacro defstate (lexer name &body rules)
   (let* ((lexer-sym (gensym))
-         (state-sym (gensym))
-         (rules (loop for rule in rules
-                      if (eq :mixin (first rule))
-                        collect `(%process ,lexer-sym ,(second rule))
-                      else
-                        collect (append `(%rule ,lexer-sym)
-                                        rule)
-                      end)))
-    `(defmethod %process ((,lexer-sym ,lexer) (,state-sym (eql ,name)))
-       (or ,@rules
-           (%rule ,lexer-sym "$"
-             :state :pop!)
-           (%rule ,lexer-sym "."
-             :token :error)))))
+         (state-sym (gensym)))
+    ;; We're going to loop over all specified rules and collect two things:
+    ;; 1. A list of macro calls to %RULE, with as their second argument a newly
+    ;;    gensym'd symbol.
+    ;; 2. A list of LET-bindings for around the method definition from those
+    ;;    symbols to calls to PPCRE:CREATE-SCANNER.
+    (multiple-value-bind (rules let-bindings)
+        (loop for (regex . instructions)
+                in (append rules
+                           ;; Because of the following two rules every state
+                           ;; automatically stops at the end of the file, and
+                           ;; all errors (when no rule matches) are caught.
+                           '(("$" :state :pop!)
+                             ("." :token :error)))
+              for let-sym = (gensym "RULE-REGEX")
+              if (eq :mixin regex)
+                ;; This is not a normal rule, so the names REGEX and
+                ;; INSTRUCTIONS are not relevant. Instead, the form looks like
+                ;; the following: (:mixin STATE-NAME).
+                collect `(%process ,lexer-sym ,regex)
+                  into rules
+              else
+                collect (append `(%rule ,lexer-sym ,let-sym)
+                                instructions)
+                  into rules
+                  and collect
+                      (list let-sym (rule-scanner-definition
+                                     regex))
+                into bindings
+              end
+              finally (return (values rules bindings)))
+      `(let (,@let-bindings)
+         (defmethod %process ((,lexer-sym ,lexer) (,state-sym (eql ,name)))
+           (or ,@rules))))))
 
 (defmethod process ((lexer regex-lexer) state)
   (catch :pop!
