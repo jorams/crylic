@@ -1,7 +1,9 @@
 (defpackage :crylic/regex-lexer
   (:use :cl :crylic/lexer)
   (:export #:regex-lexer
-           #:defstate))
+           #:defstate
+           ;; Utilities
+           #:words))
 (in-package :crylic/regex-lexer)
 
 (defclass regex-lexer () ()
@@ -143,3 +145,11 @@ and/or entering a new state."
     (when (and (numberp pops-left)
                (plusp pops-left))
       (throw :pop! (1- pops-left)))))
+
+;;; Utilities -----------------------------------------------------------------
+
+(defun words (list &key (prefix "") (suffix ""))
+  (format nil "~A(~{~A~^|~})~A"
+          prefix
+          list
+          suffix))
