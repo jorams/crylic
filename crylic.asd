@@ -14,7 +14,8 @@
                 :components ((:file "ini")
                              (:file "properties")
                              (:file "regedit")
-                             (:file "cfengine3")))
+                             (:file "cfengine3")
+                             (:file "apache")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))

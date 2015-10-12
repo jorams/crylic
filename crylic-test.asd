@@ -10,6 +10,7 @@
                 :components ((:static-file "test.ini")
                              (:static-file "java.properties")
                              (:static-file "example.reg")
-                             (:static-file "example.cf"))))
+                             (:static-file "example.cf")
+                             (:static-file "apache2.conf"))))
   :perform (test-op :after (op component)
                     (funcall (intern "RUN" :crylic-test/framework))))

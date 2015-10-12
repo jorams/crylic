@@ -70,3 +70,8 @@
                    crylic/lexers/cfengine3:cfengine3-lexer
                    "cfengine3"
                    "example.cf")
+
+(test-compare-html apache
+                   crylic/lexers/apache:apache-lexer
+                   "apacheconf"
+                   "apache2.conf")
