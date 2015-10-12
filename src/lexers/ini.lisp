@@ -11,8 +11,8 @@
   (:mime-types "text/x-ini"))
 
 (defstate ini-lexer :root
-  ("\\s+" (:token :text))
-  ("[;#].*" (:token :comment.single))
-  ("\\[.*?\\]$" (:token :keyword))
+  ("\\s+" :token :text)
+  ("[;#].*" :token :comment.single)
+  ("\\[.*?\\]$" :token :keyword)
   ("(.*?)([ \\t]*)(=)([ \\t]*)(.*(?:\\n[ \\t].+)*)"
-   (:groups (:name.attribute :text :operator :text :string))))
+   :groups (:name.attribute :text :operator :text :string)))

@@ -11,25 +11,27 @@
   (:mime-types "text/x-windows-registry"))
 
 (defstate regedit-lexer :root
-  ("Windows Registry Editor.*" (:token :text))
-  ("\\s+" (:token :text))
-  ("[;#].*" (:token :comment.single))
+  ("Windows Registry Editor.*" :token :text)
+  ("\\s+" :token :text)
+  ("[;#].*" :token :comment.single)
   ("(\\[)(-?)(HKEY_[A-Z_]+)(.*?\\])$"
-   (:groups (:keyword :operator :name.builtin :keyword)))
+   :groups (:keyword :operator :name.builtin :keyword))
   ;; String keys, which obey somewhat normal escaping
   ("(\"(?:\\\\\"|\\\\\\\\|[^\"])+\")([ \\t]*)(=)([ \\t]*)"
-   (:groups (:name.attribute :text :operator :text))
-   (:state :value))
+   :groups (:name.attribute :text :operator :text)
+   :state :value)
   ;; Bare keys (includes @)
   ("(.*?)([ \\t]*)(=)([ \\t]*)"
-   (:groups (:name.attribute :text :operator :text))
-   (:state :value)))
+   :groups (:name.attribute :text :operator :text)
+   :state :value))
 
 (defstate regedit-lexer :value
-  ("-" (:token :operator) (:state :pop!)) ; delete value
+  ("-" :token :operator
+       :state :pop!) ; delete value
   ("(dword|hex(?:\\([0-9a-fA-F]\\))?)(:)([0-9a-fA-F,]+)"
-   (:groups (:name.variable :punctuation :number))
-   (:state :pop!))
+   :groups (:name.variable :punctuation :number)
+   :state :pop!)
   ;; As far as I know, .reg files do not support line continuation.
-  (".+" (:token :string) (:state :pop!))
-  ("" (:state :pop!)))
+  (".+" :token :string
+        :state :pop!)
+  ("" :state :pop!))

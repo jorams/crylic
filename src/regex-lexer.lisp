@@ -63,13 +63,12 @@ and/or entering a new state."
     (when (and start end (= start *position*))
       ;; Update the capture end to point to the previous match end, and the
       ;; match end to point to the newly found match end.
-      (dolist (instruction instructions)
-        (destructuring-bind (operator argument) instruction
-          (case operator
-            (:token (progress-token argument start end))
-            (:groups (progress-groups argument reg-start reg-end))
-            (:state (enter-state lexer argument))
-            (t (funcall operator argument)))))
+      (loop for (operator argument) on instructions by #'cddr
+            do (case operator
+                 (:token (progress-token argument start end))
+                 (:groups (progress-groups argument reg-start reg-end))
+                 (:state (enter-state lexer argument))
+                 (t (funcall operator argument))))
       (throw :restart t))))
 
 (defmacro %rule (lexer-sym pattern &body instructions)
@@ -99,9 +98,9 @@ and/or entering a new state."
     `(defmethod %process ((,lexer-sym ,lexer) (,state-sym (eql ,name)))
        (or ,@rules
            (%rule ,lexer-sym "$"
-             (:state :pop!))
+             :state :pop!)
            (%rule ,lexer-sym "."
-             (:token :error))))))
+             :token :error)))))
 
 (defmethod process ((lexer regex-lexer) state)
   (catch :pop!

@@ -11,7 +11,7 @@
   (:mime-types "text/x-java-properties"))
 
 (defstate properties-lexer :root
-  ("\\s+" (:token :text))
-  ("(?:[;#]|//).*$" (:token :comment))
+  ("\\s+" :token :text)
+  ("(?:[;#]|//).*$" :token :comment)
   ("(.*?)([ \\t]*)([=:])([ \\t]*)(.*(?:(?<=\\\\)\\n.*)*)"
-   (:groups (:name.attribute :text :operator :text :string))))
+   :groups (:name.attribute :text :operator :text :string)))
