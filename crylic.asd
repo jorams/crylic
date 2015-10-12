@@ -17,7 +17,8 @@
                              (:file "cfengine3")
                              (:file "apache")
                              (:file "nginx")
-                             (:file "lighttpd")))
+                             (:file "lighttpd")
+                             (:file "squid")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))

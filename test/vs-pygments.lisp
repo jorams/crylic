@@ -85,3 +85,8 @@
                    crylic/lexers/lighttpd:lighttpd-lexer
                    "lighty"
                    "lighttpd.conf")
+
+(test-compare-html squid
+                   crylic/lexers/squid:squid-lexer
+                   "squidconf"
+                   "squid.conf")
