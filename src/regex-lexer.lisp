@@ -51,9 +51,18 @@
 
 (defun enter-state (lexer name)
   "Continue processing input using the new state."
-  (if (eq name :pop!)
-      (throw :pop! t)
-      (process lexer name)))
+  (let ((options (when (consp name) (rest name)))
+        (name (if (consp name)
+                  (first name)
+                  name)))
+    (if (eq name :pop!)
+        ;; the pop! count is specified here as the number of pops left. Since
+        ;; one pop is being executed here, the option should immediately be
+        ;; decremented.
+        (throw :pop! (or (when (first options)
+                           (1- (first options)))
+                         0))
+        (process lexer name))))
 
 
 (defun try-progress (lexer regex instructions)
@@ -128,6 +137,9 @@ and/or entering a new state."
            (or ,@rules))))))
 
 (defmethod process ((lexer regex-lexer) state)
-  (catch :pop!
-    (loop (catch :restart
-            (%process lexer state)))))
+  (let ((pops-left (catch :pop!
+                     (loop (catch :restart
+                             (%process lexer state))))))
+    (when (and (numberp pops-left)
+               (plusp pops-left))
+      (throw :pop! (1- pops-left)))))
