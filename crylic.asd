@@ -18,7 +18,8 @@
                              (:file "apache")
                              (:file "nginx")
                              (:file "lighttpd")
-                             (:file "squid")))
+                             (:file "squid")
+                             (:file "kconfig")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))

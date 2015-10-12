@@ -14,6 +14,7 @@
                              (:static-file "apache2.conf")
                              (:static-file "nginx.conf")
                              (:static-file "lighttpd.conf")
-                             (:static-file "squid.conf"))))
+                             (:static-file "squid.conf")
+                             (:static-file "Config.in.cache"))))
   :perform (test-op :after (op component)
                     (funcall (intern "RUN" :crylic-test/framework))))

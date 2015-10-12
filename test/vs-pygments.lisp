@@ -90,3 +90,8 @@
                    crylic/lexers/squid:squid-lexer
                    "squidconf"
                    "squid.conf")
+
+(test-compare-html kconfig
+                   crylic/lexers/kconfig:kconfig-lexer
+                   "kconfig"
+                   "Config.in.cache")
