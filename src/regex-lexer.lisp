@@ -45,8 +45,9 @@
   (loop for rstart across reg-start
         for rend across reg-end
         for token in groups
-        do (capture-token token rstart rend)
-           (setf *position* rend)))
+        do (when (and rstart rend)
+             (capture-token token rstart rend)
+             (setf *position* rend))))
 
 (defun enter-state (lexer name)
   "Continue processing input using the new state."
