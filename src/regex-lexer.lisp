@@ -107,11 +107,11 @@ and/or entering a new state."
                            '(("$" :state :pop!)
                              ("." :token :error)))
               for let-sym = (gensym "RULE-REGEX")
-              if (eq :mixin regex)
+              if (eq :include regex)
                 ;; This is not a normal rule, so the names REGEX and
                 ;; INSTRUCTIONS are not relevant. Instead, the form looks like
-                ;; the following: (:mixin STATE-NAME).
-                collect `(%process ,lexer-sym ,regex)
+                ;; the following: (:include STATE-NAME).
+                collect `(%process ,lexer-sym ,(first instructions))
                   into rules
               else
                 collect (append `(%rule ,lexer-sym ,let-sym)
