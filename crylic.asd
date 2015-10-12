@@ -15,7 +15,8 @@
                              (:file "properties")
                              (:file "regedit")
                              (:file "cfengine3")
-                             (:file "apache")))
+                             (:file "apache")
+                             (:file "nginx")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))

@@ -75,3 +75,8 @@
                    crylic/lexers/apache:apache-lexer
                    "apacheconf"
                    "apache2.conf")
+
+(test-compare-html nginx
+                   crylic/lexers/nginx:nginx-lexer
+                   "nginx"
+                   "nginx.conf")
