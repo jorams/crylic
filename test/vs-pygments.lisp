@@ -80,3 +80,8 @@
                    crylic/lexers/nginx:nginx-lexer
                    "nginx"
                    "nginx.conf")
+
+(test-compare-html lighttpd
+                   crylic/lexers/lighttpd:lighttpd-lexer
+                   "lighty"
+                   "lighttpd.conf")
