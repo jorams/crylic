@@ -9,7 +9,7 @@
   (:tags "cfengine3" "cf3")
   (:filenames "*.cf"))
 
-(defstate cfengine3-lexer :root
+(defstate cfengine3-lexer :root ()
   ("#.*?\\n" :token :comment)
   ("(body)(\\s+)(\\S+)(\\s+)(control)"
    :groups (:keyword :text :keyword :text :keyword))
@@ -37,7 +37,7 @@
   ("\\w+" :token :name.function)
   ("\\s+" :token :text))
 
-(defstate cfengine3-lexer :string
+(defstate cfengine3-lexer :string ()
   ("\\$[{(]" :token :string.interpol
              :state :interpol)
   ("\\\\." :token :string.escape)
@@ -46,14 +46,14 @@
   ("\\n" :token :string)
   ("." :token :string))
 
-(defstate cfengine3-lexer :interpol
+(defstate cfengine3-lexer :interpol ()
   ("\\$[{(]" :token :string.interpol
              :state :interpol)
   ("[})]" :token :string.interpol
           :state :pop!)
   ("[^${()}]+"  :token :string.interpol))
 
-(defstate cfengine3-lexer :arglist
+(defstate cfengine3-lexer :arglist ()
   ("\\)" :token :punctuation
          :state :pop!)
   ("," :token :punctuation)

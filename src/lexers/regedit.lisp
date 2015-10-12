@@ -10,7 +10,7 @@
   (:filenames "*.reg")
   (:mime-types "text/x-windows-registry"))
 
-(defstate regedit-lexer :root
+(defstate regedit-lexer :root ()
   ("Windows Registry Editor.*" :token :text)
   ("\\s+" :token :text)
   ("[;#].*" :token :comment.single)
@@ -25,7 +25,7 @@
    :groups (:name.attribute :text :operator :text)
    :state :value))
 
-(defstate regedit-lexer :value
+(defstate regedit-lexer :value ()
   ("-" :token :operator
        :state :pop!) ; delete value
   ("(dword|hex(?:\\([0-9a-fA-F]\\))?)(:)([0-9a-fA-F,]+)"

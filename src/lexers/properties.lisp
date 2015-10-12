@@ -10,7 +10,7 @@
   (:filenames "*.properties")
   (:mime-types "text/x-java-properties"))
 
-(defstate properties-lexer :root
+(defstate properties-lexer :root ()
   ("\\s+" :token :text)
   ("(?:[;#]|//).*$" :token :comment)
   ("(.*?)([ \\t]*)([=:])([ \\t]*)(.*(?:(?<=\\\\)\\n.*)*)"

@@ -75,19 +75,21 @@ and/or entering a new state."
   (unless (null instructions)
     `(try-progress ,lexer-sym ,pattern ',instructions)))
 
-(defun rule-scanner-definition (pattern)
+(defun rule-scanner-definition (pattern state-flags)
   (let* ((regex (format nil "\\A~A"
                         (if (consp pattern)
                             (first pattern)
                             pattern))))
     `(ppcre:create-scanner
       ,@(if (consp pattern)
-            (cons regex (cdr pattern))
+            (cons regex (rest pattern))
             (list regex))
+      ,@state-flags
       :single-line-mode nil
       :multi-line-mode t)))
 
-(defmacro defstate (lexer name &body rules)
+(defmacro defstate (lexer name (&rest state-flags)
+                    &body rules)
   (let* ((lexer-sym (gensym))
          (state-sym (gensym)))
     ;; We're going to loop over all specified rules and collect two things:
@@ -115,8 +117,8 @@ and/or entering a new state."
                                 instructions)
                   into rules
                   and collect
-                      (list let-sym (rule-scanner-definition
-                                     regex))
+                      (list let-sym (rule-scanner-definition regex
+                                                             state-flags))
                 into bindings
               end
               finally (return (values rules bindings)))

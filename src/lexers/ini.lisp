@@ -10,7 +10,7 @@
   (:filenames "*.ini" "*.cfg")
   (:mime-types "text/x-ini"))
 
-(defstate ini-lexer :root
+(defstate ini-lexer :root ()
   ("\\s+" :token :text)
   ("[;#].*" :token :comment.single)
   ("\\[.*?\\]$" :token :keyword)
