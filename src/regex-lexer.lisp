@@ -86,7 +86,7 @@ and/or entering a new state."
     `(try-progress ,lexer-sym ,pattern ',instructions)))
 
 (defun rule-scanner-definition (pattern state-flags)
-  (let* ((regex (format nil "\\A~A"
+  (let* ((regex (format nil "\\A(?:~A)"
                         (if (consp pattern)
                             (first pattern)
                             pattern))))
