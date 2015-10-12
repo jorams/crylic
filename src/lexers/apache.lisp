@@ -30,11 +30,11 @@
   ("\\d+\\.\\d+\\.\\d+\\.\\d+(?:/\\d+)?" :token :number)
   ("\\d+" :token :number)
   ("/([a-z0-9][\\w./-]+)" :token :string.other)
-  (#.(concatenate 'string
-                  "(on|off|none|any|all|double|email|dns|min|minimal|"
-                  "os|productonly|full|emerg|alert|crit|error|warn|"
-                  "notice|info|debug|registry|script|inetd|standalone|"
-                  "user|group)\\b")
-     :token :keyword)
+  (((concatenate 'string
+                 "(on|off|none|any|all|double|email|dns|min|minimal|"
+                 "os|productonly|full|emerg|alert|crit|error|warn|"
+                 "notice|info|debug|registry|script|inetd|standalone|"
+                 "user|group)\\b"))
+   :token :keyword)
   ("\"([^\"\\\\]*(?:\\\\.[^\"\\\\]*)*)\"" :token :string.double)
   ("[^\\s\"\\\\]+" :token :text))
