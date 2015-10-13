@@ -19,7 +19,8 @@
                              (:file "nginx")
                              (:file "lighttpd")
                              (:file "squid")
-                             (:file "kconfig")))
+                             (:file "kconfig")
+                             (:file "bash")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))

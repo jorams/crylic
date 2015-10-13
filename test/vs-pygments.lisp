@@ -95,3 +95,8 @@
                    crylic/lexers/kconfig:kconfig-lexer
                    "kconfig"
                    "Config.in.cache")
+
+(test-compare-html bash
+                   crylic/lexers/bash:bash-lexer
+                   "bash"
+                   "example.sh")
