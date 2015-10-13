@@ -100,3 +100,8 @@
                    crylic/lexers/bash:bash-lexer
                    "bash"
                    "example.sh")
+
+(test-compare-html docker
+                   crylic/lexers/docker:docker-lexer
+                   "docker"
+                   "docker.docker")

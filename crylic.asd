@@ -20,7 +20,8 @@
                              (:file "lighttpd")
                              (:file "squid")
                              (:file "kconfig")
-                             (:file "bash")))
+                             (:file "bash")
+                             (:file "docker")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))
