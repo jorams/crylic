@@ -87,18 +87,21 @@ and/or entering a new state."
   (unless (null instructions)
     `(try-progress ,lexer-sym ,pattern ',instructions)))
 
-(defun rule-scanner-definition (pattern state-flags)
-  (let* ((regex `(format nil "\\A(?:~A)"
-                         ,(if (consp pattern)
-                              (first pattern)
-                              pattern))))
-    `(ppcre:create-scanner
-      ,@(if (consp pattern)
-            (cons regex (rest pattern))
-            (list regex))
-      ,@state-flags
-      :single-line-mode nil
-      :multi-line-mode t)))
+;; This function is wrapped in an EVAL-WHEN because it's used by an invocation
+;; of DEFSTATE later on.
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun rule-scanner-definition (pattern state-flags)
+    (let* ((regex `(format nil "\\A(?:~A)"
+                           ,(if (consp pattern)
+                                (first pattern)
+                                pattern))))
+      `(ppcre:create-scanner
+        ,@(if (consp pattern)
+              (cons regex (rest pattern))
+              (list regex))
+        ,@state-flags
+        :single-line-mode nil
+        :multi-line-mode t))))
 
 (defmacro defstate (lexer name (&rest state-flags)
                     &body rules)
@@ -110,13 +113,7 @@ and/or entering a new state."
     ;; 2. A list of LET-bindings for around the method definition from those
     ;;    symbols to calls to PPCRE:CREATE-SCANNER.
     (multiple-value-bind (rules let-bindings)
-        (loop for (regex . instructions)
-                in (append rules
-                           ;; Because of the following two rules every state
-                           ;; automatically stops at the end of the file, and
-                           ;; all errors (when no rule matches) are caught.
-                           '(("\\Z" :state :pop!)
-                             ("." :token :error)))
+        (loop for (regex . instructions) in rules
               for let-sym = (gensym "RULE-REGEX")
               if (eq :include regex)
                 ;; This is not a normal rule, so the names REGEX and
@@ -138,10 +135,17 @@ and/or entering a new state."
          (defmethod %process ((,lexer-sym ,lexer) (,state-sym (eql ,name)))
            (or ,@rules))))))
 
+(defstate regex-lexer 'end-of-state ()
+  ;; Because of the following two rules every state automatically stops at the
+  ;; end of the file, and all errors (when no rule matches) are caught.
+  ("\\Z" :state :pop!)
+  ("." :token :error))
+
 (defmethod process ((lexer regex-lexer) state)
   (let ((pops-left (catch :pop!
                      (loop (catch :restart
-                             (%process lexer state))))))
+                             (%process lexer state)
+                             (%process lexer 'end-of-state))))))
     (when (and (numberp pops-left)
                (plusp pops-left))
       (throw :pop! (1- pops-left)))))
