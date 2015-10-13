@@ -139,6 +139,7 @@ and/or entering a new state."
   ;; Because of the following two rules every state automatically stops at the
   ;; end of the file, and all errors (when no rule matches) are caught.
   ("\\Z" :state :pop!)
+  ("\\n" :token :text)
   ("." :token :error))
 
 (defmethod process ((lexer regex-lexer) state)
