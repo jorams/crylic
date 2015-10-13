@@ -27,6 +27,12 @@
     (process lexer :root)
     (reverse *tokens*)))
 
+(defun delegate-lex (lexer text)
+  (let ((*input* text)
+        (*position* 0))
+    (process lexer :root))
+  (incf *position* (length text)))
+
 (defun capture-token (type capture-start capture-end)
   "This function is responsible for collecting new tokens."
   (unless (= capture-start capture-end)
@@ -80,6 +86,8 @@ and/or entering a new state."
                  (:token (progress-token argument start end))
                  (:groups (progress-groups argument reg-start reg-end))
                  (:state (enter-state lexer argument))
+                 (:using (delegate-lex (make-instance argument)
+                                       (subseq *input* start end)))
                  (t (funcall operator argument))))
       (throw :restart t))))
 
