@@ -8,7 +8,10 @@
 (in-package :crylic/regex-lexer)
 
 (define-lexer-type define-regex-lexer
-    (regex-lexer-class (lexer-class) ())
+    (regex-lexer-class (lexer-class)
+                       ((%flags :initarg :flags
+                                :initform ()
+                                :reader flags)))
     (regex-lexer (lexer) ()))
 
 (defgeneric %process (lexer state))
@@ -98,7 +101,7 @@ and/or entering a new state."
 ;; This is wrapped in an EVAL-WHEN because it's used by an invocation of
 ;; DEFSTATE later on.
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (defun rule-scanner-definition (pattern state-flags)
+  (defun rule-scanner-definition (pattern lexer-flags)
     (let* ((regex `(princ-to-string ,(if (consp pattern)
                                          (first pattern)
                                          pattern))))
@@ -106,30 +109,31 @@ and/or entering a new state."
         ,@(if (consp pattern)
               (cons regex (rest pattern))
               (list regex))
-        ,@state-flags
+        ,@lexer-flags
         :single-line-mode nil
         :multi-line-mode t)))
 
-  (defun expand-regex-rule (lexer-sym rule state-regex-flags)
+  (defun expand-regex-rule (lexer-sym rule lexer-regex-flags)
     (destructuring-bind (regex &rest instructions)
         rule
       (let ((let-sym (gensym "RULE-REGEX")))
         (list (append `(%rule ,lexer-sym ,let-sym)
                       instructions)
               (list let-sym
-                    (rule-scanner-definition regex state-regex-flags))))))
+                    (rule-scanner-definition regex lexer-regex-flags))))))
 
-  (defun expand-rule (lexer-sym rule state-regex-flags)
+  (defun expand-rule (lexer-sym rule lexer-regex-flags)
     (check-type rule cons)
     (case (first rule)
       (:include (list `(%process ,lexer-sym ,(second rule))
                       nil))
-      (t (expand-regex-rule lexer-sym rule state-regex-flags)))))
+      (t (expand-regex-rule lexer-sym rule lexer-regex-flags)))))
 
-(defmacro defstate (lexer name (&rest state-flags)
+(defmacro defstate (lexer name ()
                     &body rules)
   (let* ((lexer-sym (gensym))
-         (state-sym (gensym)))
+         (state-sym (gensym))
+         (lexer-flags (flags (find-class lexer))))
     ;; We're going to loop over all specified rules and collect two things:
     ;; 1. A list of macro calls to %RULE, with as their second argument a newly
     ;;    gensym'd symbol.
@@ -141,7 +145,7 @@ and/or entering a new state."
         (loop for rule in rules
               for (expansion binding) = (expand-rule lexer-sym
                                                      rule
-                                                     state-flags)
+                                                     lexer-flags)
               when expansion
                 collect it into expansions
               when binding

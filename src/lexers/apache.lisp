@@ -9,9 +9,10 @@
    "Lexer for configuration files following the Apache config file format.")
   (:tags "apacheconf" "aconf" "apache")
   (:filenames ".htaccess" "apache.conf" "apache2.conf")
-  (:mime-types "text/x-apacheconf"))
+  (:mime-types "text/x-apacheconf")
+  (:flags :multi-line-mode t :case-insensitive-mode t))
 
-(defstate apache-lexer :root (:multi-line-mode t :case-insensitive-mode t)
+(defstate apache-lexer :root ()
   ("\\s+" :token :text)
   ("(#.*?)$" :token :comment)
   ("(<[^\\s>]+)(?:(\\s+)(.*?))?(>)"
@@ -21,7 +22,7 @@
    :state :value)
   ("\\.+" :token :text))
 
-(defstate apache-lexer :value (:multi-line-mode t :case-insensitive-mode t)
+(defstate apache-lexer :value ()
   ("\\\\\\n" :token :text)
   ("$" :token :text
        :state :pop!)

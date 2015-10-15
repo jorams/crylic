@@ -8,10 +8,10 @@
   (:description "Lexer for the DOS/Windows Batch file format.")
   (:tags "bat" "batch" "dosbatch" "winbatch")
   (:filenames "*.bat" "*.cmd")
-  (:mime-types "application/x-dos-batch"))
+  (:mime-types "application/x-dos-batch")
+  (:flags :multi-line-mode t :case-insensitive-mode t))
 
-(defstate batch-lexer :root  (:multi-line-mode t
-                              :case-insensitive-mode t)
+(defstate batch-lexer :root  ()
   ;; Lines can start with @ to prevent echo
   ("^\\s*@" :token :punctuation)
   ("^(\\s*)(rem\\s.*)$" :groups (:text :comment))
@@ -31,16 +31,14 @@
   (:include :basic)
   ("." :token :text))
 
-(defstate batch-lexer :echo  (:multi-line-mode t
-                              :case-insensitive-mode t)
+(defstate batch-lexer :echo  ()
   ("\\^\\^|\\^<|\\^>|\\^\\|" :token :string.escape)
   ("\\n" :token :text
          :state :pop!)
   (:include :basic)
   ("[^\\'\"^]+" :token :text))
 
-(defstate batch-lexer :basic (:multi-line-mode t
-                              :case-insensitive-mode t)
+(defstate batch-lexer :basic ()
   ("\".*?\"" :token :string.double)
   ("'.*?'" :token :string.single)
   ("`.*?`" :token :string.backtick)

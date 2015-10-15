@@ -8,7 +8,8 @@
   (:description "Lexer for Windows PowerShell code.")
   (:tags "powershell" "posh" "ps1" "psm1")
   (:filenames "*.ps1" "*.psm1")
-  (:mime-types "text/x-powershell"))
+  (:mime-types "text/x-powershell")
+  (:flags :single-line-mode t :multi-line-mode t :case-insensitive-mode t))
 
 (let ((keywords '("while" "validateset" "validaterange" "validatepattern"
                   "validatelength" "validatecount" "until" "trap" "switch"
@@ -43,9 +44,7 @@
                      "forwardhelpcategory" "forwardhelptargetname"
                      "functionality" "inputs" "link" "notes" "outputs"
                      "parameter" "remotehelprunspace" "role" "synopsis")))
-  (defstate powershell-lexer :root (:single-line-mode t
-                                    :multi-line-mode t
-                                    :case-insensitive-mode t)
+  (defstate powershell-lexer :root ()
     ;; We need to count pairs of parentheses for correct highlighting of
     ;; '$(...)' blocks in strings
     ("\\(" :token :punctuation
@@ -75,25 +74,19 @@
     ("\\w+" :token :name)
     ("[.,;@{}\\[\\]$()=+*/\\\\&%!~?^`|<>-]|::" :token :punctuation))
 
-  (defstate powershell-lexer :child (:single-line-mode t
-                                     :multi-line-mode t
-                                     :case-insensitive-mode t)
+  (defstate powershell-lexer :child ()
     ("\\)" :token :punctuation
            :state :pop!)
     (:include :root))
 
-  (defstate powershell-lexer :multiline (:single-line-mode t
-                                         :multi-line-mode t
-                                         :case-insensitive-mode t)
+  (defstate powershell-lexer :multiline ()
     ("[^#&.]+" :token :comment.multiline)
     ("#(>|&gt;)" :token :comment.multiline
                  :state :pop!)
     (((words commenthelp :prefix "\\.")) :token :string.doc)
     ("[#&.]" :token :comment.multiline))
 
-  (defstate powershell-lexer :string (:single-line-mode t
-                                      :multi-line-mode t
-                                      :case-insensitive-mode t)
+  (defstate powershell-lexer :string ()
     ("`[0abfnrtv'\\\"$`]" :token :string.escape)
     ("[^$`\"]+" :token :string.double)
     ("\\$\\(" :token :punctuation
@@ -103,9 +96,7 @@
     ("\"" :token :string.double
           :state :pop!))
 
-  (defstate powershell-lexer :heredoc-double (:single-line-mode t
-                                              :multi-line-mode t
-                                              :case-insensitive-mode t)
+  (defstate powershell-lexer :heredoc-double ()
     ("\\n\"@" :token :string.heredoc
               :state :pop!)
     ("\\$\\(" :token :punctuation

@@ -8,14 +8,14 @@
   (:description "Lexer for Docker configuration files.")
   (:tags "docker" "dockerfile")
   (:filenames "Dockerfile" "*.docker")
-  (:mime-types "text/x-dockerfile-config"))
+  (:mime-types "text/x-dockerfile-config")
+  (:flags :case-insensitive-mode t :multi-line-mode t))
 
 (let ((keywords
         (concatenate 'string
                      "(?:FROM|MAINTAINER|CMD|EXPOSE|ENV|ADD|ENTRYPOINT|"
                      "VOLUME|WORKDIR)")))
-  (defstate docker-lexer :root (:case-insensitive-mode t
-                                :multi-line-mode t)
+  (defstate docker-lexer :root ()
     (((format nil "^(ONBUILD)(\\s+)(~A)\\b" keywords))
      :groups (:name.keyword :whitespace :keyword))
     (((format nil "^(~A)\\b(.*)" keywords))
