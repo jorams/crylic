@@ -79,8 +79,6 @@ and/or entering a new state."
   (multiple-value-bind (start end reg-start reg-end)
       (ppcre:scan regex *input* :start *position*)
     (when (and start end)
-      ;; Update the capture end to point to the previous match end, and the
-      ;; match end to point to the newly found match end.
       (loop for (operator argument) on instructions by #'cddr
             do (case operator
                  (:token (progress-token argument start end))
@@ -95,8 +93,8 @@ and/or entering a new state."
   (unless (null instructions)
     `(try-progress ,lexer-sym ,pattern ',instructions)))
 
-;; This function is wrapped in an EVAL-WHEN because it's used by an invocation
-;; of DEFSTATE later on.
+;; This is wrapped in an EVAL-WHEN because it's used by an invocation of
+;; DEFSTATE later on.
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun rule-scanner-definition (pattern state-flags)
     (let* ((regex `(format nil "\\A(?:~A)"
@@ -109,7 +107,23 @@ and/or entering a new state."
               (list regex))
         ,@state-flags
         :single-line-mode nil
-        :multi-line-mode t))))
+        :multi-line-mode t)))
+
+  (defun expand-regex-rule (lexer-sym rule state-regex-flags)
+    (destructuring-bind (regex &rest instructions)
+        rule
+      (let ((let-sym (gensym "RULE-REGEX")))
+        (list (append `(%rule ,lexer-sym ,let-sym)
+                      instructions)
+              (list let-sym
+                    (rule-scanner-definition regex state-regex-flags))))))
+
+  (defun expand-rule (lexer-sym rule state-regex-flags)
+    (check-type rule cons)
+    (case (first rule)
+      (:include (list `(%process ,lexer-sym ,(second rule))
+                      nil))
+      (t (expand-regex-rule lexer-sym rule state-regex-flags)))))
 
 (defmacro defstate (lexer name (&rest state-flags)
                     &body rules)
@@ -120,32 +134,26 @@ and/or entering a new state."
     ;;    gensym'd symbol.
     ;; 2. A list of LET-bindings for around the method definition from those
     ;;    symbols to calls to PPCRE:CREATE-SCANNER.
+    ;; One special rule type is specified as (:include :state-name), causing
+    ;; the state's rules to be called in place of a normal rule definition.
     (multiple-value-bind (rules let-bindings)
-        (loop for (regex . instructions) in rules
-              for let-sym = (gensym "RULE-REGEX")
-              if (eq :include regex)
-                ;; This is not a normal rule, so the names REGEX and
-                ;; INSTRUCTIONS are not relevant. Instead, the form looks like
-                ;; the following: (:include STATE-NAME).
-                collect `(%process ,lexer-sym ,(first instructions))
-                  into rules
-              else
-                collect (append `(%rule ,lexer-sym ,let-sym)
-                                instructions)
-                  into rules
-                  and collect
-                      (list let-sym (rule-scanner-definition regex
-                                                             state-flags))
-                into bindings
-              end
-              finally (return (values rules bindings)))
+        (loop for rule in rules
+              for (expansion binding) = (expand-rule lexer-sym
+                                                     rule
+                                                     state-flags)
+              when expansion
+                collect it into expansions
+              when binding
+                collect it into bindings
+              finally (return (values expansions bindings)))
       `(let (,@let-bindings)
          (defmethod %process ((,lexer-sym ,lexer) (,state-sym (eql ,name)))
            (or ,@rules))))))
 
 (defstate regex-lexer 'end-of-state ()
-  ;; Because of the following two rules every state automatically stops at the
-  ;; end of the file, and all errors (when no rule matches) are caught.
+  ;; This state is automatically processed after every normal state, to stop
+  ;; processing at the end of the file, to catch any unmatched newlines and to
+  ;; catch errors.
   ("\\z" :state :pop!)
   ("\\n" :token :text)
   ("." :token :error))
