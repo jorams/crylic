@@ -169,8 +169,9 @@ and/or entering a new state."
 
 ;;; Utilities -----------------------------------------------------------------
 
-(defun words (list &key (prefix "") (suffix ""))
-  (format nil "~A(~{~A~^|~})~A"
+(defun words (list &key (prefix "") (suffix "") (capturing t))
+  (format nil "~A(~A~{~A~^|~})~A"
           prefix
+          (if capturing "" "?:")
           list
           suffix))
