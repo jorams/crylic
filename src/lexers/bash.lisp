@@ -42,7 +42,7 @@
                  "shopt|source|suspend|test|time|times|trap|true|type|typeset|"
                  "ulimit|umask|unalias|unset|wait)\\s*\\b(?!\\.)"))
    :token :name.builtin)
-  ("#!.+\\n" :token :comment.hashbang)
+  ("\\A#!.+\\n" :token :comment.hashbang)
   ("#.*\\n" :token :comment.single)
   ("\\\\[\\w\\W]" :token :string.escape)
   ("(\\b\\w+)(\\s*)(=)"
