@@ -21,7 +21,8 @@
                              (:file "squid")
                              (:file "kconfig")
                              (:file "bash")
-                             (:file "docker")))
+                             (:file "docker")
+                             (:file "tcsh")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))

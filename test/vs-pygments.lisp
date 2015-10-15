@@ -105,3 +105,8 @@
                    crylic/lexers/docker:docker-lexer
                    "docker"
                    "docker.docker")
+
+(test-compare-html tcsh
+                   crylic/lexers/tcsh:tcsh-lexer
+                   "tcsh"
+                   "test.tcsh")
