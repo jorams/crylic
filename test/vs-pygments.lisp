@@ -115,3 +115,13 @@
                    crylic/lexers/powershell:powershell-lexer
                    "powershell"
                    "test.ps1")
+
+(test-compare-html scheme
+                   crylic/lexers/scheme:scheme-lexer
+                   "scheme"
+                   "boot-9.scm")
+
+(test-compare-html scheme-r6rs-comments
+                   crylic/lexers/scheme:scheme-lexer
+                   "scheme"
+                   "r6rs-comments.scm")

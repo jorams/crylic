@@ -24,7 +24,8 @@
                              (:file "bash")
                              (:file "docker")
                              (:file "tcsh")
-                             (:file "powershell")))
+                             (:file "powershell")
+                             (:file "scheme")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))
