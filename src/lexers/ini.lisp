@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/ini
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:ini-lexer))
 (in-package :crylic/lexers/ini)
 
-(define-lexer ini-lexer (regex-lexer) ()
+(define-regex-lexer ini-lexer () ()
   (:title "INI")
   (:description "Lexer for configuration files in INI style.")
   (:tags "ini" "cfg" "dosini")

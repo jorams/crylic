@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/docker
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:docker-lexer))
 (in-package :crylic/lexers/docker)
 
-(define-lexer docker-lexer (regex-lexer) ()
+(define-regex-lexer docker-lexer () ()
   (:title "Docker")
   (:description "Lexer for Docker configuration files.")
   (:tags "docker" "dockerfile")

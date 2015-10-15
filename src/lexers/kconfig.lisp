@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/kconfig
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:kconfig-lexer))
 (in-package :crylic/lexers/kconfig)
 
-(define-lexer kconfig-lexer (regex-lexer) ()
+(define-regex-lexer kconfig-lexer () ()
   (:title "Kconfig")
   (:description "Lexer for Linux-style Kconfig files.")
   (:tags "kconfig" "menuconfig" "linux-config" "kernel-config")

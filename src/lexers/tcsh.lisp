@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/tcsh
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:tcsh-lexer))
 (in-package :crylic/lexers/tcsh)
 
-(define-lexer tcsh-lexer (regex-lexer) ()
+(define-regex-lexer tcsh-lexer () ()
   (:title "Tcsh")
   (:description "Lexer for tcsh scripts.")
   (:tags "tcsh" "csh")

@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/nginx
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:nginx-lexer))
 (in-package :crylic/lexers/nginx)
 
-(define-lexer nginx-lexer (regex-lexer) ()
+(define-regex-lexer nginx-lexer () ()
   (:title "Nginx configuration file")
   (:description "Lexer for Nginx configuration files.")
   (:tags "nginx")

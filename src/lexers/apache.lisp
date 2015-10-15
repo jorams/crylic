@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/apache
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:apache-lexer))
 (in-package :crylic/lexers/apache)
 
-(define-lexer apache-lexer (regex-lexer) ()
+(define-regex-lexer apache-lexer () ()
   (:title "ApacheConf")
   (:description
    "Lexer for configuration files following the Apache config file format.")

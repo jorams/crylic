@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/squid
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:squid-lexer))
 (in-package :crylic/lexers/squid)
 
-(define-lexer squid-lexer (regex-lexer) ()
+(define-regex-lexer squid-lexer () ()
   (:title "SquidConf")
   (:description "Lexer for Squid configuration files.")
   (:tags "squidconf" "squid.conf" "squid")

@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/scheme
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:scheme-lexer))
 (in-package :crylic/lexers/scheme)
 
-(define-lexer scheme-lexer (regex-lexer) ()
+(define-regex-lexer scheme-lexer () ()
   (:title "Scheme")
   (:description "Lexer for Scheme code.")
   (:tags "scheme" "scm")

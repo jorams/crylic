@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/batch
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:batch-lexer))
 (in-package :crylic/lexers/batch)
 
-(define-lexer batch-lexer (regex-lexer) ()
+(define-regex-lexer batch-lexer () ()
   (:title "Batchfile")
   (:description "Lexer for the DOS/Windows Batch file format.")
   (:tags "bat" "batch" "dosbatch" "winbatch")

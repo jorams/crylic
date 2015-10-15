@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/bash
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:bash-lexer))
 (in-package :crylic/lexers/bash)
 
-(define-lexer bash-lexer (regex-lexer) ()
+(define-regex-lexer bash-lexer () ()
   (:title "Bash")
   (:description "Lexer for (ba|k|)sh shell scripts.")
   (:tags "bash" "sh" "ksh" "shell")

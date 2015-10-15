@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/powershell
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:powershell-lexer))
 (in-package :crylic/lexers/powershell)
 
-(define-lexer powershell-lexer (regex-lexer) ()
+(define-regex-lexer powershell-lexer () ()
   (:title "PowerShell")
   (:description "Lexer for Windows PowerShell code.")
   (:tags "powershell" "posh" "ps1" "psm1")

@@ -1,13 +1,15 @@
 (defpackage :crylic/regex-lexer
   (:use :cl :crylic/lexer)
-  (:export #:regex-lexer
+  (:export #:define-regex-lexer
+           #:regex-lexer
            #:defstate
            ;; Utilities
            #:words))
 (in-package :crylic/regex-lexer)
 
-(defclass regex-lexer () ()
-  (:metaclass lexer-class))
+(define-lexer-type define-regex-lexer
+    (regex-lexer-class (lexer-class) ())
+    (regex-lexer (lexer) ()))
 
 (defgeneric %process (lexer state))
 (defgeneric process (lexer state))

@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/properties
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:properties-lexer))
 (in-package :crylic/lexers/properties)
 
-(define-lexer properties-lexer (regex-lexer) ()
+(define-regex-lexer properties-lexer () ()
   (:title "Properties")
   (:description "Lexer for configuration files in Java's properties format.")
   (:tags "properties" "jproperties")

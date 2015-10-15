@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/regedit
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:regedit-lexer))
 (in-package :crylic/lexers/regedit)
 
-(define-lexer regedit-lexer (regex-lexer) ()
+(define-regex-lexer regedit-lexer () ()
   (:title "reg")
   (:description "Lexer for Windows Registry files produced by regedit.")
   (:tags "registry")

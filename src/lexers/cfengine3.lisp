@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/cfengine3
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:cfengine3-lexer))
 (in-package :crylic/lexers/cfengine3)
 
-(define-lexer cfengine3-lexer (regex-lexer) ()
+(define-regex-lexer cfengine3-lexer () ()
   (:title "CFEngine3")
   (:description "Lexer for CFEngine3 policy files")
   (:tags "cfengine3" "cf3")

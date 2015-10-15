@@ -1,9 +1,9 @@
 (defpackage :crylic/lexers/lighttpd
-  (:use :cl :crylic/lexer :crylic/regex-lexer)
+  (:use :cl :crylic/regex-lexer)
   (:export #:lighttpd-lexer))
 (in-package :crylic/lexers/lighttpd)
 
-(define-lexer lighttpd-lexer (regex-lexer) ()
+(define-regex-lexer lighttpd-lexer () ()
   (:title "Lighttpd configuration file")
   (:description "Lexer for Lighttpd configuration files.")
   (:tags "lighty" "lighttpd")
