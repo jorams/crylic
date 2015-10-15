@@ -1,5 +1,5 @@
 (defpackage :crylic/regex-lexer
-  (:use :cl :crylic/lexer)
+  (:use :closer-common-lisp :crylic/lexer)
   (:export #:define-regex-lexer
            #:regex-lexer
            #:defstate
@@ -11,8 +11,18 @@
     (regex-lexer-class (lexer-class)
                        ((%flags :initarg :flags
                                 :initform ()
-                                :reader flags)))
+                                :reader flags)
+                        (%default-state :initarg :default-state
+                                        :initform :root
+                                        :reader default-state)))
     (regex-lexer (lexer) ()))
+
+(defmethod ensure-class-using-class :after ((class regex-lexer-class)
+                                            name
+                                            &key &allow-other-keys)
+  (when (consp (default-state class))
+    (setf (slot-value class '%default-state)
+          (first (default-state class)))))
 
 (defgeneric %process (lexer state))
 (defgeneric process (lexer state))
@@ -29,7 +39,7 @@
   (let ((*input* text)
         (*tokens* ())
         (*position* 0))
-    (process lexer :root)
+    (process lexer (default-state (class-of lexer)))
     (reverse *tokens*)))
 
 (defun delegate-lex (lexer text)
