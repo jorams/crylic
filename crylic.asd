@@ -9,6 +9,7 @@
                (:file "lexer")
                (:file "filter")
                (:file "renderer")
+               (:file "cl-ppcre-extensions")
                (:file "regex-lexer")
                (:module "lexers"
                 :components ((:file "ini")

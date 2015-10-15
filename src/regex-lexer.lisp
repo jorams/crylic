@@ -97,11 +97,10 @@ and/or entering a new state."
 ;; DEFSTATE later on.
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defun rule-scanner-definition (pattern state-flags)
-    (let* ((regex `(format nil "\\A(?:~A)"
-                           ,(if (consp pattern)
-                                (first pattern)
-                                pattern))))
-      `(ppcre:create-scanner
+    (let* ((regex `(princ-to-string ,(if (consp pattern)
+                                         (first pattern)
+                                         pattern))))
+      `(crylic/cl-ppcre-extensions:create-scanner
         ,@(if (consp pattern)
               (cons regex (rest pattern))
               (list regex))
