@@ -18,6 +18,7 @@
                              (:static-file "Config.in.cache")
                              (:static-file "example.sh")
                              (:static-file "docker.docker")
-                             (:static-file "test.tcsh"))))
+                             (:static-file "test.tcsh")
+                             (:static-file "test.ps1"))))
   :perform (test-op :after (op component)
                     (funcall (intern "RUN" :crylic-test/framework))))

@@ -110,3 +110,8 @@
                    crylic/lexers/tcsh:tcsh-lexer
                    "tcsh"
                    "test.tcsh")
+
+(test-compare-html powershell
+                   crylic/lexers/powershell:powershell-lexer
+                   "powershell"
+                   "test.ps1")

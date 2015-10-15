@@ -22,7 +22,8 @@
                              (:file "kconfig")
                              (:file "bash")
                              (:file "docker")
-                             (:file "tcsh")))
+                             (:file "tcsh")
+                             (:file "powershell")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))
