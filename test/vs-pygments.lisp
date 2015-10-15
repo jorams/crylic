@@ -116,6 +116,11 @@
                    "powershell"
                    "test.ps1")
 
+(test-compare-html batch
+                   crylic/lexers/batch:batch-lexer
+                   "batch"
+                   "batchfile.bat")
+
 (test-compare-html scheme
                    crylic/lexers/scheme:scheme-lexer
                    "scheme"

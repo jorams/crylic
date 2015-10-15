@@ -20,6 +20,7 @@
                              (:static-file "docker.docker")
                              (:static-file "test.tcsh")
                              (:static-file "test.ps1")
+                             (:static-file "batchfile.bat")
                              (:static-file "boot-9.scm")
                              (:static-file "r6rs-comments.scm"))))
   :perform (test-op :after (op component)

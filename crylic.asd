@@ -25,6 +25,7 @@
                              (:file "docker")
                              (:file "tcsh")
                              (:file "powershell")
+                             (:file "batch")
                              (:file "scheme")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
