@@ -91,35 +91,32 @@
          "(?:25[0-4]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)(?:\\.(?:25[0-4]|2[0-4]\\d|1\\d\\d|"
          "[1-9]?\\d)){3}))")))
   (defstate squid-lexer :root ()
-    ("\\s+" :token :whitespace)
-    ("#" :token :comment
-         :state :comment)
+    ("\\s+" :whitespace)
+    ("#" :comment (state :comment))
     (((words keywords :prefix "\\b" :suffix "\\b"))
-     :token :keyword)
+     :keyword)
     (((words opts :prefix "\\b" :suffix "\\b"))
-     :token :name.constant)
+     :name.constant)
     ;; Actions
     (((words actions :prefix "\\b" :suffix "\\b"))
-     :token :string)
+     :string)
     (((words actions-stats :prefix "stats/" :suffix "\\b"))
-     :token :string)
+     :string)
     (((words actions-log :prefix "log/" :suffix "="))
-     :token :string)
+     :string)
     (((words acls :prefix "\\b" :suffix "\\b"))
-     :token :keyword)
+     :keyword)
     (((concatenate 'string
                    ip-re
                    "(?:/(?:"
                    ip-re
                    "|\\b\\d+\\b))?"))
-     :token :number.float)
-    ("(?:\\b\\d+\\b(?:-\\b\\d+|%)?)" :token :number)
-    ("\\S+" :token :text)))
+     :number.float)
+    ("(?:\\b\\d+\\b(?:-\\b\\d+|%)?)" :number)
+    ("\\S+" :text)))
 
 
 (defstate squid-lexer :comment ()
-  ("\\s*TAG:.*" :token :string.escape
-                :state :pop!)
-  (".+" :token :comment
-        :state :pop!)
-  ("" :state :pop!))
+  ("\\s*TAG:.*" :string.escape (state :pop!))
+  (".+" :comment (state :pop!))
+  ("" (state :pop!)))

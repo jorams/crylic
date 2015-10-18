@@ -11,38 +11,33 @@
 
 (defstate nginx-lexer :root ()
   ("(include)(\\s+)([^\\s;]+)"
-   :groups (:keyword :text :name))
-  ("[^\\s;#]+" :token :keyword
-               :state :stmt)
+   (groups :keyword :text :name))
+  ("[^\\s;#]+" :keyword (state :stmt))
   (:include :base))
 
 (defstate nginx-lexer :block ()
-  ("\\}" :token :punctuation
-         :state (:pop! 2))
-  ("[^\\s;#]+" :token :keyword.namespace
-               :state :stmt)
+  ("\\}" :punctuation (state :pop! 2))
+  ("[^\\s;#]+" :keyword.namespace (state :stmt))
   (:include :base))
 
 (defstate nginx-lexer :stmt ()
-  ("\\{" :token :punctuation
-         :state :block)
-  (";" :token :punctuation
-       :state :pop!)
+  ("\\{" :punctuation (state :block))
+  (";" :punctuation (state :pop!))
   (:include :base))
 
 (defstate nginx-lexer :base ()
-  ("#.*\\n" :token :comment.single)
-  ("on|off" :token :name.constant)
-  ("\\$[^\\s;#()]+" :token :name.variable)
+  ("#.*\\n" :comment.single)
+  ("on|off" :name.constant)
+  ("\\$[^\\s;#()]+" :name.variable)
   ("([a-z0-9.-]+)(:)([0-9]+)"
-   :groups (:name :punctuation :number.integer))
-  ("[a-z-]+/[a-z-+]+" :token :string)   ; mimetype
-  ("[0-9]+[km]?\\b" :token :number.integer)
+   (groups :name :punctuation :number.integer))
+  ("[a-z-]+/[a-z-+]+" :string)          ; mimetype
+  ("[0-9]+[km]?\\b" :number.integer)
   ("(~)(\\s*)([^\\s{]+)"
-   :groups (:punctuation :text :string.regex))
-  ("[:=~]" :token :punctuation)
-  ("[^\\s;#{}$]+" :token :string)       ; catch all
-  ("/[^\\s;#]*" :token :name)           ; pathname
-  ("\\s+" :token :text)
-  ("[$;]" :token :text)                 ; leftover characters
+   (groups :punctuation :text :string.regex))
+  ("[:=~]" :punctuation)
+  ("[^\\s;#{}$]+" :string)              ; catch all
+  ("/[^\\s;#]*" :name)                  ; pathname
+  ("\\s+" :text)
+  ("[$;]" :text)                        ; leftover characters
   )

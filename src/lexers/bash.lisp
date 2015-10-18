@@ -13,27 +13,24 @@
 
 (defstate bash-lexer :root ()
   (:include :basic)
-  ("`" :token :string.backtick
-       :state :backticks)
+  ("`" :string.backtick
+       (state :backticks))
   (:include :data)
   (:include :interp))
 
 (defstate bash-lexer :interp ()
-  ("\\$\\(\\(" :token :keyword
-               :state :math)
-  ("\\$\\(" :token :keyword
-            :state :paren)
-  ("\\$\\{#?" :token :string.interpol
-              :state :curly)
-  ("\\$[a-fA-F_][a-fA-F0-9_]*" :token :name.variable) ; user variable
-  ("\\$(?:\\d+|[#$?!_*@-])" :token :name.variable)    ; builtin
-  ("\\$" :token :text))
+  ("\\$\\(\\(" :keyword (state :math))
+  ("\\$\\(" :keyword (state :paren))
+  ("\\$\\{#?" :string.interpol (state :curly))
+  ("\\$[a-fA-F_][a-fA-F0-9_]*" :name.variable) ; user variable
+  ("\\$(?:\\d+|[#$?!_*@-])" :name.variable)    ; builtin
+  ("\\$" :text))
 
 (defstate bash-lexer :basic ()
   (((concatenate 'string
                  "\\b(if|fi|else|while|do|done|for|then|return|function|case|"
                  "select|continue|until|esac|elif)(\\s*)\\b"))
-   :groups (:keyword :text))
+   (groups :keyword :text))
   (((concatenate 'string
                  "\\b(alias|bg|bind|break|builtin|caller|cd|command|compgen|"
                  "complete|declare|dirs|disown|echo|enable|eval|exec|exit|"
@@ -41,62 +38,55 @@
                  "local|logout|popd|printf|pushd|pwd|read|readonly|set|shift|"
                  "shopt|source|suspend|test|time|times|trap|true|type|typeset|"
                  "ulimit|umask|unalias|unset|wait)\\s*\\b(?!\\.)"))
-   :token :name.builtin)
-  ("\\A#!.+\\n" :token :comment.hashbang)
-  ("#.*\\n" :token :comment.single)
-  ("\\\\[\\w\\W]" :token :string.escape)
-  ("(\\b\\w+)(\\s*)(=)"
-   :groups (:name.variable :text :operator))
-  ("[\\[\\]{}()=]" :token :operator)
-  ("<<<" :token :operator)              ; here-string
-  ("<<-?\\s*(\\'?)\\\\?(\\w+)[\\w\\W]+?\\2" :token :string)
-  ("&&|\\|\\|" :token :operator))
+   :name.builtin)
+  ("\\A#!.+\\n" :comment.hashbang)
+  ("#.*\\n" :comment.single)
+  ("\\\\[\\w\\W]" :string.escape)
+  ("(\\b\\w+)(\\s*)(=)" (groups :name.variable :text :operator))
+  ("[\\[\\]{}()=]" :operator)
+  ("<<<" :operator)                     ; here-string
+  ("<<-?\\s*(\\'?)\\\\?(\\w+)[\\w\\W]+?\\2" :string)
+  ("&&|\\|\\|" :operator))
 
 (defstate bash-lexer :data ()
-  ("(?s)\\$?\"(\\\\\\\\|\\\\[0-7]+|\\\\.|[^\"\\\\$])*\""
-   :token :string.double)
-  ("\"" :token :string.double
-        :state :string)
-  ("(?s)\\$'(\\\\\\\\|\\\\[0-7]+|\\\\.|[^'\\\\])*'" :token :string.single)
-  ("(?s)'.*?'" :token :string.single)
-  (";" :token :punctuation)
-  ("&" :token :punctuation)
-  ("\\|" :token :punctuation)
-  ("\\s+" :token :text)
-  ("\\d+(?= |\\Z)" :token :number)
-  ("[^=\\s\\[\\]{}()$\"\\'`\\\\<&|;]+" :token :text)
-  ("<" :token :text))
+  ("(?s)\\$?\"(\\\\\\\\|\\\\[0-7]+|\\\\.|[^\"\\\\$])*\"" :string.double)
+  ("\"" :string.double
+        (state :string))
+  ("(?s)\\$'(\\\\\\\\|\\\\[0-7]+|\\\\.|[^'\\\\])*'" :string.single)
+  ("(?s)'.*?'" :string.single)
+  (";" :punctuation)
+  ("&" :punctuation)
+  ("\\|" :punctuation)
+  ("\\s+" :text)
+  ("\\d+(?= |\\Z)" :number)
+  ("[^=\\s\\[\\]{}()$\"\\'`\\\\<&|;]+" :text)
+  ("<" :text))
 
 (defstate bash-lexer :string ()
-  ("\"" :token :string.double
-        :state :pop!)
-  ("(?s)(\\\\\\\\|\\\\[0-7]+|\\\\.|[^\"\\\\$])+" :token :string.double)
+  ("\"" :string.double (state :pop!))
+  ("(?s)(\\\\\\\\|\\\\[0-7]+|\\\\.|[^\"\\\\$])+" :string.double)
   (:include :interp))
 
 (defstate bash-lexer :curly ()
-  ("\\}" :token :string.interpol
-         :state :pop!)
-  (":-" :token :keyword)
-  ("\\w+" :token :name.variable)
-  ("[^}:\"\\'`$\\\\]+" :token :punctuation)
-  (":" :token :punctuation)
+  ("\\}" :string.interpol (state :pop!))
+  (":-" :keyword)
+  ("\\w+" :name.variable)
+  ("[^}:\"\\'`$\\\\]+" :punctuation)
+  (":" :punctuation)
   (:include :root))
 
 (defstate bash-lexer :paren ()
-  ("\\)" :token :keyword
-         :state :pop!)
+  ("\\)" :keyword (state :pop!))
   (:include :root))
 
 (defstate bash-lexer :math ()
-  ("\\)\\)" :token :keyword
-            :state :pop!)
-  ("[-+*/%^|&]|\\*\\*|\\|\\|" :token :operator)
-  ("\\d+#\\d+" :token :number)
-  ("\\d+#(?! )" :token :number)
-  ("\\d+" :token :number)
+  ("\\)\\)" :keyword (state :pop!))
+  ("[-+*/%^|&]|\\*\\*|\\|\\|" :operator)
+  ("\\d+#\\d+" :number)
+  ("\\d+#(?! )" :number)
+  ("\\d+" :number)
   (:include :root))
 
 (defstate bash-lexer :backticks ()
-  ("`" :token :string.backtick
-       :state :pop!)
+  ("`" :string.backtick (state :pop!))
   (:include :root))

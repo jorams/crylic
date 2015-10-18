@@ -47,59 +47,50 @@
   (defstate powershell-lexer :root ()
     ;; We need to count pairs of parentheses for correct highlighting of
     ;; '$(...)' blocks in strings
-    ("\\(" :token :punctuation
-           :state :child)
-    ("\\s+" :token :text)
+    ("\\(" :punctuation (state :child))
+    ("\\s+" :text)
     (((words commenthelp :prefix "^(\\s*#[#\\s]*)(\\."
                          :suffix ")([^\\n]*$)"
                          :capturing nil))
-     :groups (:comment :string.doc :comment))
-    ("#[^\\n]*?$" :token :comment)
-    ("(&lt;|<)#" :token :comment.multiline
-                 :state :multiline)
-    ("@\"\\n" :token :string.heredoc
-              :state :heredoc-double)
-    ("@'\\n.*?\\n'@" :token :string.heredoc)
+     (groups :comment :string.doc :comment))
+    ("#[^\\n]*?$" :comment)
+    ("(&lt;|<)#" :comment.multiline
+                 (state :multiline))
+    ("@\"\\n" :string.heredoc (state :heredoc-double))
+    ("@'\\n.*?\\n'@" :string.heredoc)
     ;; escaped syntax
-    ("`[\\'\"$@-]" :token :punctuation)
-    ("\"" :token :string.double
-          :state :string)
-    ("'([^']|'')*'" :token :string.single)
-    ("(\\$|@@|@)((global|script|private|env):)?\\w+" :token :name.variable)
-    (((words keywords :suffix "\\b")) :token :keyword)
-    (((words operators :prefix "-" :suffix "\\b")) :token :operator)
-    (((words verbs :suffix "-[a-z_]\\w*\\b")) :token :name.builtin)
-    ("\\[[a-z_\\[][\\w. `,\\[\\]]*\\]" :token :name.constant) ; .net [type]s
-    ("-[a-z_]\\w*" :token :name)
-    ("\\w+" :token :name)
-    ("[.,;@{}\\[\\]$()=+*/\\\\&%!~?^`|<>-]|::" :token :punctuation))
+    ("`[\\'\"$@-]" :punctuation)
+    ("\"" :string.double (state :string))
+    ("'([^']|'')*'" :string.single)
+    ("(\\$|@@|@)((global|script|private|env):)?\\w+" :name.variable)
+    (((words keywords :suffix "\\b")) :keyword)
+    (((words operators :prefix "-" :suffix "\\b")) :operator)
+    (((words verbs :suffix "-[a-z_]\\w*\\b")) :name.builtin)
+    ("\\[[a-z_\\[][\\w. `,\\[\\]]*\\]" :name.constant) ; .net [type]s
+    ("-[a-z_]\\w*" :name)
+    ("\\w+" :name)
+    ("[.,;@{}\\[\\]$()=+*/\\\\&%!~?^`|<>-]|::" :punctuation))
 
   (defstate powershell-lexer :child ()
-    ("\\)" :token :punctuation
-           :state :pop!)
+    ("\\)" :punctuation (state :pop!))
     (:include :root))
 
   (defstate powershell-lexer :multiline ()
-    ("[^#&.]+" :token :comment.multiline)
-    ("#(>|&gt;)" :token :comment.multiline
-                 :state :pop!)
-    (((words commenthelp :prefix "\\.")) :token :string.doc)
-    ("[#&.]" :token :comment.multiline))
+    ("[^#&.]+" :comment.multiline)
+    ("#(>|&gt;)" :comment.multiline (state :pop!))
+    (((words commenthelp :prefix "\\.")) :string.doc)
+    ("[#&.]" :comment.multiline))
 
   (defstate powershell-lexer :string ()
-    ("`[0abfnrtv'\\\"$`]" :token :string.escape)
-    ("[^$`\"]+" :token :string.double)
-    ("\\$\\(" :token :punctuation
-              :state :child)
-    ("\"\"" :token :string.double)
-    ("[`$]" :token :string.double)
-    ("\"" :token :string.double
-          :state :pop!))
+    ("`[0abfnrtv'\\\"$`]" :string.escape)
+    ("[^$`\"]+" :string.double)
+    ("\\$\\(" :punctuation (state :child))
+    ("\"\"" :string.double)
+    ("[`$]" :string.double)
+    ("\"" :string.double (state :pop!)))
 
   (defstate powershell-lexer :heredoc-double ()
-    ("\\n\"@" :token :string.heredoc
-              :state :pop!)
-    ("\\$\\(" :token :punctuation
-              :state :child)
-    ("[^@\\n]+\"]" :token :string.heredoc)
-    ("." :token :string.heredoc)))
+    ("\\n\"@" :string.heredoc (state :pop!))
+    ("\\$\\(" :punctuation (state :child))
+    ("[^@\\n]+\"]" :string.heredoc)
+    ("." :string.heredoc)))

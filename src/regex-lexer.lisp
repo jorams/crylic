@@ -3,9 +3,15 @@
   (:export #:define-regex-lexer
            #:regex-lexer
            #:defstate
+           ;; Instructions
+           #:state
+           #:groups
+           #:using
            ;; Utilities
            #:words))
 (in-package :crylic/regex-lexer)
+
+;;; The regex lexer -----------------------------------------------------------
 
 (define-lexer-type define-regex-lexer
     (regex-lexer-class (lexer-class)
@@ -24,32 +30,61 @@
     (setf (slot-value class '%default-state)
           (first (default-state class)))))
 
-(defgeneric %process (lexer state))
-(defgeneric process (lexer state))
 
+;;; Processing ----------------------------------------------------------------
+
+;; Processing happens through the generic function %PROCESS, whose methods are
+;; responsible for doing any actual work. They are usually defined using
+;; DEFSTATE.
+(defgeneric %process (lexer state))
+
+;; PROCESS essentially wraps %PROCESS in machinery to take care of popping the
+;; process stack and making sure the matching process ends.
+(defun process (lexer state)
+  (let ((pops-left (catch :pop!
+                     (loop (catch :restart
+                             (%process lexer state)
+                             (%process lexer 'end-of-state))))))
+    (when (and (numberp pops-left)
+               (plusp pops-left))
+      (throw :pop! (1- pops-left)))))
+
+;; *lexer* is, during the matching process, bound to the lexer being used for
+;; *matching.
+(defvar *lexer*)
+
+;; *input* contains the text that is being processed
 (defvar *input* "")
-(defvar *tokens* ())
 
 ;; During the matching process, whenever a regex matches at the index
-;; *position*, appropriate actions are carried out and *position* is set to the
-;; end of the match.
+;; *position*, it is set to the end of the match and appropriate instructions
+;; are carried out.
 (defvar *position* 0)
 
-(defmethod lex ((lexer regex-lexer) (text string))
+;; During the matching process, all tokens are collected into *tokens* in
+;; reverse order
+(defvar *tokens* ())
+
+(defun inner-lex (lexer text)
+  "Makes a lexer go process the input TEXT. *TOKENS* is ignored by this
+function, so it's the caller's responsibility to bind it and do something with
+the contents after processing ends."
   (let ((*input* text)
-        (*tokens* ())
+        (*lexer* lexer)
         (*position* 0))
-    (process lexer (default-state (class-of lexer)))
+    (process lexer (default-state (class-of lexer)))))
+
+(defmethod lex ((lexer regex-lexer) (text string))
+  (let ((*tokens* ()))
+    (inner-lex lexer text)
     (reverse *tokens*)))
 
-(defun delegate-lex (lexer text)
-  (let ((*input* text)
-        (*position* 0))
-    (process lexer :root))
-  (incf *position* (length text)))
+
+;;; Instructions --------------------------------------------------------------
 
 (defun capture-token (type capture-start capture-end)
-  "This function is responsible for collecting new tokens."
+  "If the text between CAPTURE-START and CAPTURE-END is not empty, collect its
+contents as a new token of type TYPE."
   (unless (= capture-start capture-end)
     (push (cons type
                 (subseq *input*
@@ -57,56 +92,69 @@
                         capture-end))
           *tokens*)))
 
-(defun progress-token (class start end)
-  "Capture a token and update capture positions."
-  (capture-token class start end)
-  ;; Update the capture to point to the new match
-  (setf *position* end))
+;; Every regex comes with a set of instructions. These instructions, after
+;; evaluation, come in two forms: keywords and functions. The keywords are
+;; interpreted as token types, causing the current match to be collected as a
+;; token. The functions are called with the match details (start, end, vectors
+;; with register start- and end positions). Every such function can in turn
+;; call APPLY-INSTRUCTION to take care of nested instructions.
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun apply-instruction (instruction start end reg-start reg-end)
+    (etypecase instruction
+      (keyword (capture-token instruction start end))
+      ((or function symbol)
+       (funcall instruction start end reg-start reg-end))))
 
-(defun progress-groups (groups reg-start reg-end)
-  "Capture a token for every matched group and update capture positions."
-  (loop for rstart across reg-start
-        for rend across reg-end
-        for token in groups
-        do (when (and rstart rend)
-             (capture-token token rstart rend)
-             (setf *position* rend))))
+  (defun groups (&rest instructions)
+    (lambda (start end reg-start reg-end)
+      (declare (ignore start end))
+      (loop for rstart across reg-start
+            for rend across reg-end
+            for instruction in instructions
+            do (when (and rstart rend)
+                 (apply-instruction instruction rstart rend nil nil)))))
 
-(defun enter-state (lexer name)
-  "Continue processing input using the new state."
-  (let ((options (when (consp name) (rest name)))
-        (name (if (consp name)
-                  (first name)
-                  name)))
-    (if (eq name :pop!)
-        ;; the pop! count is specified here as the number of pops left. Since
-        ;; one pop is being executed here, the option should immediately be
-        ;; decremented.
-        (throw :pop! (or (when (first options)
-                           (1- (first options)))
-                         0))
-        (process lexer name))))
+  (defun using (class-name &rest options)
+    (lambda (start end reg-start reg-end)
+      (declare (ignore reg-start reg-end))
+      ;; We just call INNER-LEX to take care of the matching process. *TOKENS*
+      ;; is already taken care of by the enclosing lexing operation, so all
+      ;; output of this new lexer will go to the existing *TOKENS* list.
+      (inner-lex (apply #'make-instance class-name options)
+                 (subseq *input* start end))))
+
+  (defun state (name &optional argument)
+    (lambda (start end reg-start reg-end)
+      (declare (ignore start end reg-start reg-end))
+      (if (eq name :pop!)
+          ;; The pop! count is specified here as the number of pops left. Since
+          ;; one pop is being executed here, the option should immediately be
+          ;; decremented.
+          (throw :pop! (or (when argument (1- argument))
+                           0))
+          (process *lexer* name)))))
 
 
-(defun try-progress (lexer regex instructions)
-  "Try to match REGEX and, if it matches, move forward by collecting tokens
-and/or entering a new state."
-  (multiple-value-bind (start end reg-start reg-end)
-      (ppcre:scan regex *input* :start *position*)
-    (when (and start end)
-      (loop for (operator argument) on instructions by #'cddr
-            do (case operator
-                 (:token (progress-token argument start end))
-                 (:groups (progress-groups argument reg-start reg-end))
-                 (:state (enter-state lexer argument))
-                 (:using (delegate-lex (make-instance argument)
-                                       (subseq *input* start end)))
-                 (t (funcall operator argument))))
-      (throw :restart t))))
+;;; DEFSTATE ------------------------------------------------------------------
 
-(defmacro %rule (lexer-sym pattern &body instructions)
+(defmacro %rule (regex &body instructions)
+  "Check whether REGEX matches at the current processing position and if so,
+set *POSITION* to the new start, process all INSTRUCTIONS and restart the
+current state."
   (unless (null instructions)
-    `(try-progress ,lexer-sym ,pattern ',instructions)))
+    (let ((start (gensym "START"))
+          (end (gensym "END"))
+          (reg-start (gensym "REG-START"))
+          (reg-end (gensym "REG-END")))
+      `(multiple-value-bind (,start ,end ,reg-start ,reg-end)
+           (ppcre:scan ,regex *input* :start *position*)
+         (when (and ,start ,end)
+           (setf *position* ,end)
+           ,@(loop for instruction in instructions
+                   collect `(apply-instruction ,instruction
+                                               ,start ,end
+                                               ,reg-start ,reg-end))
+           (throw :restart t))))))
 
 ;; This is wrapped in an EVAL-WHEN because it's used by an invocation of
 ;; DEFSTATE later on.
@@ -123,11 +171,11 @@ and/or entering a new state."
         :single-line-mode nil
         :multi-line-mode t)))
 
-  (defun expand-regex-rule (lexer-sym rule lexer-regex-flags)
+  (defun expand-regex-rule (rule lexer-regex-flags)
     (destructuring-bind (regex &rest instructions)
         rule
       (let ((let-sym (gensym "RULE-REGEX")))
-        (list (append `(%rule ,lexer-sym ,let-sym)
+        (list (append `(%rule ,let-sym)
                       instructions)
               (list let-sym
                     (rule-scanner-definition regex lexer-regex-flags))))))
@@ -137,7 +185,8 @@ and/or entering a new state."
     (case (first rule)
       (:include (list `(%process ,lexer-sym ,(second rule))
                       nil))
-      (t (expand-regex-rule lexer-sym rule lexer-regex-flags)))))
+      (t (expand-regex-rule rule lexer-regex-flags)))))
+
 
 (defmacro defstate (lexer name ()
                     &body rules)
@@ -166,21 +215,13 @@ and/or entering a new state."
            (or ,@rules))))))
 
 (defstate regex-lexer 'end-of-state ()
-  ;; This state is automatically processed after every normal state, to stop
-  ;; processing at the end of the file, to catch any unmatched newlines and to
-  ;; catch errors.
-  ("\\z" :state :pop!)
-  ("\\n" :token :text)
-  ("." :token :error))
+  ;; This state is automatically processed after every normal state (by
+  ;; PROCESS), to stop processing at the end of the file, to catch any
+  ;; unmatched newlines and to catch errors.
+  ("\\z" (state :pop!))
+  ("\\n" :text)
+  ("." :error))
 
-(defmethod process ((lexer regex-lexer) state)
-  (let ((pops-left (catch :pop!
-                     (loop (catch :restart
-                             (%process lexer state)
-                             (%process lexer 'end-of-state))))))
-    (when (and (numberp pops-left)
-               (plusp pops-left))
-      (throw :pop! (1- pops-left)))))
 
 ;;; Utilities -----------------------------------------------------------------
 

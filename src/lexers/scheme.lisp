@@ -58,59 +58,53 @@
       (valid-name "[\\w!$%&*+,/:<=>?@^~|-]+"))
   (defstate scheme-lexer :root ()
     ;; Comments to end of line
-    (";.*$" :token :comment.single)
+    (";.*$" :comment.single)
     ;; Multi-line comments
-    ("#\\|" :token :comment.multiline
-            :state :multiline-comment)
+    ("#\\|" :comment.multiline (state :multiline-comment))
     ;; Commented form (entire sexpr followng)
-    ("#;\\s*\\(" :token :comment
-                 :state :commented-form)
+    ("#;\\s*\\(" :comment (state :commented-form))
     ;; Signifies that the program text that follows is written with the lexical
     ;; and datum syntax described in r6rs
-    ("#!r6rs" :token :comment)
+    ("#!r6rs" :comment)
     ;; whitespace - usually not relevant
-    ("\\s+" :token :text)
+    ("\\s+" :text)
     ;; Numbers
-    ("-?\\d+\\.\\d+" :token :number.float)
-    ("-?\\d+" :token :number.integer)
+    ("-?\\d+\\.\\d+" :number.float)
+    ("-?\\d+" :number.integer)
     ;; Strings, symbols and characters
-    ("\"(\\\\\\\\|\\\\\"|[^\"])*\"" :token :string)
-    (((format nil "'~A" valid-name)) :token :string.symbol)
-    ("#\\\\([()/'\\\"._!§$%& ?=+-]|[a-zA-Z0-9]+)" :token :string.char)
+    ("\"(\\\\\\\\|\\\\\"|[^\"])*\"" :string)
+    (((format nil "'~A" valid-name)) :string.symbol)
+    ("#\\\\([()/'\\\"._!§$%& ?=+-]|[a-zA-Z0-9]+)" :string.char)
     ;; Constants
-    ("(#t|#f)" :token :name.constant)
+    ("(#t|#f)" :name.constant)
     ;; Special operators
-    ("('|#|`|,@|,|\\.)" :token :operator)
+    ("('|#|`|,@|,|\\.)" :operator)
     ;; Highlight keywords
     (((words (mapcar #'ppcre:quote-meta-chars keywords) :suffix " "))
-     :token :keyword)
+     :keyword)
     ;; First variable in a quoted string
-    (((format nil "(?<='\\()~A" valid-name)) :token :name.variable)
-    (((format nil "(?<=#\\()~A" valid-name)) :token :name.variable)
+    (((format nil "(?<='\\()~A" valid-name)) :name.variable)
+    (((format nil "(?<=#\\()~A" valid-name)) :name.variable)
     ;; Highlight builtins
     (((words (mapcar #'ppcre:quote-meta-chars builtins)
              :prefix "(?<=\\()"
              :suffix " "))
-     :token :name.builtin)
+     :name.builtin)
     ;; Remaining functions
-    (((format nil "(?<=\\()~A" valid-name)) :token :name.function)
+    (((format nil "(?<=\\()~A" valid-name)) :name.function)
     ;; Find the remaining variables
-    (valid-name :token :name.variable)
+    (valid-name :name.variable)
     ;; The famous parentheses!
-    ("(\\(|\\))" :token :punctuation)
-    ("(\\[|\\])" :token :punctuation))
+    ("(\\(|\\))" :punctuation)
+    ("(\\[|\\])" :punctuation))
 
   (defstate scheme-lexer :multiline-comment ()
-    ("#\\|" :token :comment.multiline
-            :state :multiline-comment)
-    ("\\|#" :token :comment.multiline
-            :state :pop!)
-    ("[^|#]+" :token :comment.multiline)
-    ("[|#]" :token :comment.multiline))
+    ("#\\|" :comment.multiline (state :multiline-comment))
+    ("\\|#" :comment.multiline (state :pop!))
+    ("[^|#]+" :comment.multiline)
+    ("[|#]" :comment.multiline))
 
   (defstate scheme-lexer :commented-form ()
-    ("\\(" :token :comment
-           :state :commented-form)
-    ("\\)" :token :comment
-           :state :pop!)
-    ("[^()]" :token :comment)))
+    ("\\(" :comment (state :commented-form))
+    ("\\)" :comment (state :pop!))
+    ("[^()]" :comment)))

@@ -10,13 +10,13 @@
   (:mime-types "text/x-lighttpd-conf"))
 
 (defstate lighttpd-lexer :root ()
-  ("#.*\\n" :token :comment.single)
-  ("/\\S*" :token :name)                ; pathname
-  ("[a-zA-Z._-]+" :token :keyword)
-  ("\\d+\\.\\d+\\.\\d+\\.\\d+(?:/\\d+)?" :token :number)
-  ("[0-9]+" :token :number)
-  ("=>|=~|\\+=|==|=|\\+" :token :operator)
-  ("\\$[A-Z]+" :token :name.builtin)
-  ("[(){}\\[\\],]" :token :punctuation)
-  ("\"([^\"\\\\]*(?:\\\\.[^\"\\\\]*)*)\"" :token :string.double)
-  ("\\s+" :token :text))
+  ("#.*\\n" :comment.single)
+  ("/\\S*" :name)                       ; pathname
+  ("[a-zA-Z._-]+" :keyword)
+  ("\\d+\\.\\d+\\.\\d+\\.\\d+(?:/\\d+)?" :number)
+  ("[0-9]+" :number)
+  ("=>|=~|\\+=|==|=|\\+" :operator)
+  ("\\$[A-Z]+" :name.builtin)
+  ("[(){}\\[\\],]" :punctuation)
+  ("\"([^\"\\\\]*(?:\\\\.[^\"\\\\]*)*)\"" :string.double)
+  ("\\s+" :text))

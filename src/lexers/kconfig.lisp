@@ -26,46 +26,46 @@
             level-repeat)))
 
 (defstate kconfig-lexer :root ()
-  ("\\s+" :token :text)
-  ("#.*?\\n" :token :comment.single)
+  ("\\s+" :text)
+  ("#.*?\\n" :comment.single)
   (((words '("mainmenu" "config" "menuconfig" "choice" "endchoice"
              "comment" "menu" "endmenu" "visible if" "if" "endif"
              "source" "prompt" "select" "depends on" "default"
              "range" "option")
            :suffix "\\b"))
-   :token :keyword)
-  ("(---help---|help)[\\t ]*\\n" :token :keyword
-                                 :state :help)
+   :keyword)
+  ("(---help---|help)[\\t ]*\\n" :keyword
+                                 (state :help))
   ("(bool|tristate|string|hex|int|defconfig_list|modules|env)\\b"
-   :token :name.builtin)
-  ("[!=&|]" :token :operator)
-  ("[()]" :token :punctuation)
-  ("[0-9]+" :token :number.integer)
-  ("'(''|[^'])*'" :token :string.single)
-  ("\"(\"\"|[^\"])*\"" :token :string.double)
-  ("\\S+" :token :text))
+   :name.builtin)
+  ("[!=&|]" :operator)
+  ("[()]" :punctuation)
+  ("[0-9]+" :number.integer)
+  ("'(''|[^'])*'" :string.single)
+  ("\"(\"\"|[^\"])*\"" :string.double)
+  ("\\S+" :text))
 
 ;; Help text is indented, multi-line and ends when a lower indentation level is
 ;; detected.
 (defstate kconfig-lexer :help ()
   ;; Skip blank lines after help token, if any
-  ("\\s*\\n" :token :text)
-  (((indent 7)) :token :string.doc :state :indent7)
-  (((indent 6)) :token :string.doc :state :indent6)
-  (((indent 5)) :token :string.doc :state :indent5)
-  (((indent 4)) :token :string.doc :state :indent4)
-  (((indent 3)) :token :string.doc :state :indent3)
-  (((indent 2)) :token :string.doc :state :indent2)
-  (((indent 1)) :token :string.doc :state :indent1)
-  ("" :state :pop!))
+  ("\\s*\\n" :text)
+  (((indent 7)) :string.doc (state :indent7))
+  (((indent 6)) :string.doc (state :indent6))
+  (((indent 5)) :string.doc (state :indent5))
+  (((indent 4)) :string.doc (state :indent4))
+  (((indent 3)) :string.doc (state :indent3))
+  (((indent 2)) :string.doc (state :indent2))
+  (((indent 1)) :string.doc (state :indent1))
+  ("" (state :pop!)))
 
 (defmacro define-indent-state (name level)
   ;; Print paragraphs of indentation level >= LEVEL as :string.doc, ignoring
   ;; blank lines. Then return to :root state.
   `(defstate kconfig-lexer ,name ()
-     (((indent ,level)) :token :string.doc)
-     ("\\s*\\n" :token :text)
-     ("" :state (:pop! 2))))
+     (((indent ,level)) :string.doc)
+     ("\\s*\\n" :text)
+     ("" (state :pop! 2))))
 
 (define-indent-state :indent7 7)
 (define-indent-state :indent6 6)

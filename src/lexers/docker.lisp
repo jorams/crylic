@@ -17,9 +17,9 @@
                      "VOLUME|WORKDIR)")))
   (defstate docker-lexer :root ()
     (((format nil "^(ONBUILD)(\\s+)(~A)\\b" keywords))
-     :groups (:name.keyword :whitespace :keyword))
+     (groups :name.keyword :whitespace :keyword))
     (((format nil "^(~A)\\b(.*)" keywords))
-     :groups (:keyword :string))
-    ("#.*" :token :comment)
-    ("RUN" :token :keyword)             ; Rest of line falls through
-    ("(.*\\\\\\n)*.+" :using crylic/lexers/bash:bash-lexer)))
+     (groups :keyword :string))
+    ("#.*" :comment)
+    ("RUN" :keyword)                    ; Rest of line falls through
+    ("(.*\\\\\\n)*.+" (using 'crylic/lexers/bash:bash-lexer))))
