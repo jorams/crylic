@@ -130,3 +130,27 @@
                    crylic/lexers/scheme:scheme-lexer
                    "scheme"
                    "r6rs-comments.scm")
+
+(test-compare-html java
+                   crylic/lexers/java:java-lexer
+                   "java"
+                   "test.java")
+
+(test-compare-html java-intro
+                   crylic/lexers/java:java-lexer
+                   "java"
+                   "Intro.java")
+
+;; TODO: This test fails because unicode handling in CL-PPCRE isn't the same as
+;;       in Python. We produce an error token where Pygments recognizes the
+;;       character as whitespace.
+#+nil
+(test-compare-html java-example
+                   crylic/lexers/java:java-lexer
+                   "java"
+                   "example.java")
+
+(test-compare-html java-bad-case
+                   crylic/lexers/java:java-lexer
+                   "java"
+                   "badcase.java")

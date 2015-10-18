@@ -27,7 +27,8 @@
                              (:file "tcsh")
                              (:file "powershell")
                              (:file "batch")
-                             (:file "scheme")))
+                             (:file "scheme")
+                             (:file "java")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))
