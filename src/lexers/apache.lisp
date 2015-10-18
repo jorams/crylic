@@ -30,11 +30,10 @@
   ("\\d+\\.\\d+\\.\\d+\\.\\d+(?:/\\d+)?" :number)
   ("\\d+" :number)
   ("/([a-z0-9][\\w./-]+)" :string.other)
-  (((concatenate 'string
-                 "(on|off|none|any|all|double|email|dns|min|minimal|"
-                 "os|productonly|full|emerg|alert|crit|error|warn|"
-                 "notice|info|debug|registry|script|inetd|standalone|"
-                 "user|group)\\b"))
+  (((string+ "(on|off|none|any|all|double|email|dns|min|minimal|"
+             "os|productonly|full|emerg|alert|crit|error|warn|"
+             "notice|info|debug|registry|script|inetd|standalone|"
+             "user|group)\\b"))
    :keyword)
   ("\"([^\"\\\\]*(?:\\\\.[^\"\\\\]*)*)\"" :string.double)
   ("[^\\s\"\\\\]+" :text))

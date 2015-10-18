@@ -12,9 +12,8 @@
   (:flags :case-insensitive-mode t :multi-line-mode t))
 
 (let ((keywords
-        (concatenate 'string
-                     "(?:FROM|MAINTAINER|CMD|EXPOSE|ENV|ADD|ENTRYPOINT|"
-                     "VOLUME|WORKDIR)")))
+        (string+ "(?:FROM|MAINTAINER|CMD|EXPOSE|ENV|ADD|ENTRYPOINT|"
+                 "VOLUME|WORKDIR)")))
   (defstate docker-lexer :root ()
     (((format nil "^(ONBUILD)(\\s+)(~A)\\b" keywords))
      (groups :name.keyword :whitespace :keyword))

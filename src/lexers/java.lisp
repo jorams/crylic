@@ -17,21 +17,17 @@
   ("/\\*.*?\\*/" :comment.multiline)
   ;; Keywords: go before method names to avoid lexing "throw new XYZ" as a
   ;; method signature
-  (((concatenate
-     'string
-     "(assert|break|case|catch|continue|default|do|else|finally|for|"
-     "if|goto|instanceof|new|return|switch|this|throw|try|while)\\b"))
+  (((string+ "(assert|break|case|catch|continue|default|do|else|finally|for|"
+             "if|goto|instanceof|new|return|switch|this|throw|try|while)\\b"))
    :keyword)
   ;; Method names
-  (((concatenate
-     'string
+  (((string+
      "((?:(?:[^\\W\\d]|\\$)[\\w.\\[\\]$<>]*\\s+)+?)" ; return arguments
      "((?:[^\\W\\d]|\\$)[\\w$]*)"                    ; method name
      "(\\s*)(\\()"))                                 ; signature start
    (groups (using 'java-lexer) :name.function :text :operator))
   ("@[^\\W\\d][\\w.]*" :name.decorator)
-  (((concatenate
-     'string
+  (((string+
      "(abstract|const|enum|extends|final|implements|native|private|"
      "protected|public|static|strictfp|super|synchronized|throws|"
      "transient|volatile)\\b"))

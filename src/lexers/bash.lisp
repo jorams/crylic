@@ -27,17 +27,15 @@
   ("\\$" :text))
 
 (defstate bash-lexer :basic ()
-  (((concatenate 'string
-                 "\\b(if|fi|else|while|do|done|for|then|return|function|case|"
-                 "select|continue|until|esac|elif)(\\s*)\\b"))
+  (((string+ "\\b(if|fi|else|while|do|done|for|then|return|function|case|"
+             "select|continue|until|esac|elif)(\\s*)\\b"))
    (groups :keyword :text))
-  (((concatenate 'string
-                 "\\b(alias|bg|bind|break|builtin|caller|cd|command|compgen|"
-                 "complete|declare|dirs|disown|echo|enable|eval|exec|exit|"
-                 "export|false|fc|fg|getopts|hash|help|history|jobs|kill|let|"
-                 "local|logout|popd|printf|pushd|pwd|read|readonly|set|shift|"
-                 "shopt|source|suspend|test|time|times|trap|true|type|typeset|"
-                 "ulimit|umask|unalias|unset|wait)\\s*\\b(?!\\.)"))
+  (((string+ "\\b(alias|bg|bind|break|builtin|caller|cd|command|compgen|"
+             "complete|declare|dirs|disown|echo|enable|eval|exec|exit|"
+             "export|false|fc|fg|getopts|hash|help|history|jobs|kill|let|"
+             "local|logout|popd|printf|pushd|pwd|read|readonly|set|shift|"
+             "shopt|source|suspend|test|time|times|trap|true|type|typeset|"
+             "ulimit|umask|unalias|unset|wait)\\s*\\b(?!\\.)"))
    :name.builtin)
   ("\\A#!.+\\n" :comment.hashbang)
   ("#.*\\n" :comment.single)

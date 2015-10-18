@@ -81,8 +81,7 @@
               "req_mime_type" "rep_mime_type" "method" "browser" "user" "src"
               "dst" "time" "dstdomain" "ident" "snmp_community"))
       (ip-re
-        (concatenate
-         'string
+        (string+
          "(?:(?:(?:[3-9]\\d?|2(?:5[0-5]|[0-4]?\\d)?|1\\d{0,2}|0x0*[0-9a-f]{1,2}|"
          "0+[1-3]?[0-7]{0,2})(?:\\.(?:[3-9]\\d?|2(?:5[0-5]|[0-4]?\\d)?|1\\d{0,2}|"
          "0x0*[0-9a-f]{1,2}|0+[1-3]?[0-7]{0,2})){3})|(?!.*::.*::)(?:(?!:)|"
@@ -106,11 +105,7 @@
      :string)
     (((words acls :prefix "\\b" :suffix "\\b"))
      :keyword)
-    (((concatenate 'string
-                   ip-re
-                   "(?:/(?:"
-                   ip-re
-                   "|\\b\\d+\\b))?"))
+    (((string+ ip-re "(?:/(?:" ip-re "|\\b\\d+\\b))?"))
      :number.float)
     ("(?:\\b\\d+\\b(?:-\\b\\d+|%)?)" :number)
     ("\\S+" :text)))

@@ -8,7 +8,8 @@
            #:groups
            #:using
            ;; Utilities
-           #:words))
+           #:words
+           #:string+))
 (in-package :crylic/regex-lexer)
 
 ;;; The regex lexer -----------------------------------------------------------
@@ -231,3 +232,6 @@ current state."
           (if capturing "" "?:")
           list
           suffix))
+
+(defun string+ (&rest strings)
+  (apply #'concatenate 'string strings))

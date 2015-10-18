@@ -22,10 +22,9 @@
   ("\\b(set)(\\s+)(\\w+)" (groups :keyword :text :name.variable))
   ("\\b(call)(\\s+)(:\\w+)" (groups :keyword :text :name.label))
   ("\\b(goto)(\\s+)(\\w+)" (groups :keyword :text :name.label))
-  (((concatenate 'string
-                 "\\b(set|call|echo|on|off|endlocal|for|do|goto|if|pause|"
-                 "setlocal|shift|errorlevel|exist|defined|cmdextversion|"
-                 "errorlevel|else|cd|md|del|deltree|cls|choice)\\b"))
+  (((string+ "\\b(set|call|echo|on|off|endlocal|for|do|goto|if|pause|"
+             "setlocal|shift|errorlevel|exist|defined|cmdextversion|"
+             "errorlevel|else|cd|md|del|deltree|cls|choice)\\b"))
    :keyword)
   ("\\b(equ|neq|lss|leq|gtr|geq)\\b" :operator)
   (:include :basic)
