@@ -154,3 +154,13 @@
                    crylic/lexers/java:java-lexer
                    "java"
                    "badcase.java")
+
+(test-compare-html gosu
+                   crylic/lexers/gosu:gosu-lexer
+                   "gosu"
+                   "example.gs")
+
+(test-compare-html gosu-template
+                   crylic/lexers/gosu:gosu-template-lexer
+                   "gst"
+                   "example.gst")

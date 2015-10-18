@@ -28,7 +28,8 @@
                              (:file "powershell")
                              (:file "batch")
                              (:file "scheme")
-                             (:file "java")))
+                             (:file "java")
+                             (:file "gosu")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))
