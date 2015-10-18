@@ -4,6 +4,7 @@
   :author "Joram Schrijver <i@joram.io>"
   :license "MIT"
   :depends-on (#:cl-ppcre #:split-sequence #:closer-mop)
+  :serial t
   :pathname "src"
   :components ((:file "tokens")
                (:file "lexer")
