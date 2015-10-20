@@ -234,4 +234,4 @@ current state."
           suffix))
 
 (defun string+ (&rest strings)
-  (apply #'concatenate 'string strings))
+  (apply #'concatenate 'string (mapcar #'string strings)))
