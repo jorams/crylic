@@ -30,7 +30,8 @@
                              (:file "scheme")
                              (:file "java")
                              (:file "gosu")
-                             (:file "groovy")))
+                             (:file "groovy")
+                             (:file "ioke")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))

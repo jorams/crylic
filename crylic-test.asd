@@ -30,6 +30,7 @@
                              (:static-file "example.gs")
                              (:static-file "example.gst")
                              (:static-file "example.groovy")
-                             (:static-file "test.groovy"))))
+                             (:static-file "test.groovy")
+                             (:static-file "intro.ik"))))
   :perform (test-op :after (op component)
                     (funcall (intern "RUN" :crylic-test/framework))))

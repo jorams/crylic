@@ -174,3 +174,8 @@
                    crylic/lexers/groovy:groovy-lexer
                    "groovy"
                    "test.groovy")
+
+(test-compare-html ioke
+                   crylic/lexers/ioke:ioke-lexer
+                   "ioke"
+                   "intro.ik")
