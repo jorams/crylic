@@ -29,7 +29,8 @@
                              (:file "batch")
                              (:file "scheme")
                              (:file "java")
-                             (:file "gosu")))
+                             (:file "gosu")
+                             (:file "groovy")))
                (:module "filters"
                 :components ((:file "merge-consecutive")
                              (:file "split-multiline")))

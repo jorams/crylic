@@ -164,3 +164,13 @@
                    crylic/lexers/gosu:gosu-template-lexer
                    "gst"
                    "example.gst")
+
+(test-compare-html groovy-basic
+                   crylic/lexers/groovy:groovy-lexer
+                   "groovy"
+                   "example.groovy")
+
+(test-compare-html groovy
+                   crylic/lexers/groovy:groovy-lexer
+                   "groovy"
+                   "test.groovy")
