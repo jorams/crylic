@@ -1,4 +1,3 @@
-(in-package :asdf-user)
 (asdf:defsystem :crylic-test-vs-pygments
   :description "Tests comparing Crylic to Pygments"
   :author "Joram Schrijver <i@joram.io>"

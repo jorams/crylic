@@ -1,5 +1,4 @@
-(in-package :asdf-user)
-(defsystem :crylic
+(asdf:defsystem :crylic
   :description "Syntax highlighting library for Common Lisp"
   :author "Joram Schrijver <i@joram.io>"
   :license "MIT"

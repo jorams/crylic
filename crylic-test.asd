@@ -1,5 +1,4 @@
-(in-package :asdf-user)
-(defsystem :crylic-test
+(asdf:defsystem :crylic-test
   :description "Tests for Crylic"
   :author "Joram Schrijver <i@joram.io>"
   :serial t
