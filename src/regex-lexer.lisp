@@ -230,7 +230,7 @@ current state."
   (format nil "~A(~A~{~A~^|~})~A"
           prefix
           (if capturing "" "?:")
-          list
+          (mapcar #'ppcre:quote-meta-chars list)
           suffix))
 
 (defun string+ (&rest strings)

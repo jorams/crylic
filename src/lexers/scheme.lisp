@@ -80,13 +80,13 @@
     ;; Special operators
     ("('|#|`|,@|,|\\.)" :operator)
     ;; Highlight keywords
-    (((words (mapcar #'ppcre:quote-meta-chars keywords) :suffix " "))
+    (((words keywords :suffix " "))
      :keyword)
     ;; First variable in a quoted string
     (((format nil "(?<='\\()~A" valid-name)) :name.variable)
     (((format nil "(?<=#\\()~A" valid-name)) :name.variable)
     ;; Highlight builtins
-    (((words (mapcar #'ppcre:quote-meta-chars builtins)
+    (((words builtins
              :prefix "(?<=\\()"
              :suffix " "))
      :name.builtin)
