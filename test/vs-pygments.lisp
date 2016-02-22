@@ -179,3 +179,23 @@
                    crylic/lexers/ioke:ioke-lexer
                    "ioke"
                    "intro.ik")
+
+(test-compare-html clojure
+                   crylic/lexers/clojure:clojure-lexer
+                   "clojure"
+                   "genclass.clj")
+
+(test-compare-html clojure-escape-semicolon
+                   crylic/lexers/clojure:clojure-lexer
+                   "clojure"
+                   "escape_semicolon.clj")
+
+(test-compare-html clojure-weird-keywords
+                   crylic/lexers/clojure:clojure-lexer
+                   "clojure"
+                   "clojure-weird-keywords.clj")
+
+(test-compare-html clojurescript
+                   crylic/lexers/clojure:clojurescript-lexer
+                   "clojurescript"
+                   "core.cljs")
