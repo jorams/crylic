@@ -36,7 +36,7 @@
 
 (defmethod render ((renderer html-renderer) (tokens list) (stream stream))
   (when (wrap-p renderer)
-    (format stream "<div class=\"~A\"><pre>" (wrapper-css-class renderer)))
+    (format stream "<div class=\"~A\"><pre><span></span>" (wrapper-css-class renderer)))
   (dolist (token tokens)
     (render-span token stream))
   (when (wrap-p renderer)
